@@ -373,6 +373,8 @@ function chartComplete() {
         // Delay the current weather request until the others (charts) have completed,
         // because it takes a long time and slows down poor little Pi :(
         loadCurrentData();
+        // also load weather info from forecast.io
+	loadOutsideWeather();
     }
 
     if(this.options.doStats) {
