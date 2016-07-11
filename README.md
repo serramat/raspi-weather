@@ -1,5 +1,9 @@
 # Raspberry Pi weather station
 
+TODO: Update README !!!!
+This is a fork of https://github.com/ofalvai/raspi-weather, adapted for Adafruit's BME280 sensor.
+
+
 DHT22 temperature/humidity sensor logger and browser dashboard for the Raspberry Pi. Based on [Adafruit's DHT22 Python library](https://github.com/adafruit/Adafruit_Python_DHT).
 
 ![Screenshot](/public/images/screenshot.png?raw=true)
