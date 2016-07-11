@@ -184,7 +184,7 @@ function loadChart(APICall, DOMtarget, moreOptions) {
         var options = $.extend(true, {}, globalHighchartsOptions, moreOptions);
 
         $.each(json.data, function(index, el) {
-            var m = moment.utc(el.timestamp).local();
+            var m = moment.utc(el.timestamp, 'ddd MMM DD HH:mm:ss YYYY').local();
 
             // Populating the series
             options.series[0].data.push([
