@@ -60,7 +60,7 @@ var globalHighchartsOptions = {
         zoomType: 'x',
         // To prevent the humidity axis to have ticks over 100:
         alignTicks: false, 
-        marginLeft: 50,
+        marginLeft: 110,
         marginRight: 50,
         events: {
             load: chartComplete
@@ -96,6 +96,19 @@ var globalHighchartsOptions = {
         max: 100,
         // To prevent the humidity axis to have unrealistic ticks: only 0, 50, 100
         tickAmount: 3
+    },
+    {
+        title: {
+            text: 'Pressure (hPa)',
+            margin: 5,
+            style: {
+                fontWeight: 'bold'
+            }
+        },
+        offset: 50,
+        min: 990,
+        max: 1040,
+        tickInterval: 50
     }],
     series: [{
             name: 'Temperature',
@@ -133,7 +146,20 @@ var globalHighchartsOptions = {
                 valueSuffix: '%'
             },
             color: '#869BCE'
+        },
+        {
+            name: 'Pressure',
+            yAxis: 2,
+            data: [],
+            marker: {
+                enabled: false
+            },
+            tooltip: {
+                valueSuffix: 'hPa'
+            },
+            color: '#55d0a1'
         }
+
     ],
     legend: {
         align: 'left',
@@ -195,6 +221,11 @@ function loadChart(APICall, DOMtarget, moreOptions) {
             options.series[1].data.push([
                 m.valueOf(),
                 el.humidity
+            ]);
+
+	    options.series[2].data.push([
+                m.valueOf(),
+                format(el.pressure)
             ]);
 
             // Computing plot bands for the night interval(s)
