@@ -361,6 +361,7 @@ function loadCurrentData() {
 
         $('#curr-temp-inside').text(format(json.temperature) + '°');
         $('#curr-hum-inside').text(json.humidity + '%');
+	$('#curr-press-inside').text(json.pressure + ' hPa');
     });
 }
 
@@ -561,7 +562,7 @@ $(document).ready(function() {
 
 
     $('#btn-reload-inside').on('click', function() {
-        $('#curr-temp-inside, #curr-hum-inside').text('...');
+        $('#curr-temp-inside, #curr-hum-inside, #curr-press-inside').text('...');
         loadCurrentData();
     });
 
@@ -572,7 +573,7 @@ $(document).ready(function() {
 
     $('#btn-reload-all').on('click', function() {
         $('#error-container').empty();
-        $('#curr-temp-outside, #curr-hum-outside, #curr-temp-inside, #curr-hum-inside, #forecast-summary').text('...');
+        $('#curr-temp-outside, #curr-hum-outside, #curr-temp-inside, #curr-hum-inside, #curr-press-inside, #forecast-summary').text('...');
         $('#chart-today-vs, #chart-past').each(function(i, el) {
             if ($(el).highcharts()) {
                 // It might be uninitialized due to a previous error (eg. network error)

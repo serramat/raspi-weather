@@ -1,13 +1,15 @@
 #!/usr/bin/python
 
-import Adafruit_DHT
+from Adafruit_BME280 import *
 
-sensor = Adafruit_DHT.DHT22
-pin = 4
+sensor = BME280(mode=BME280_OSAMPLE_8)
 
 try:
-    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-    print '{0:0.1f}\n{1}'.format(temperature, int(humidity))
+    temperature = sensor.read_temperature()
+    humidity = sensor.read_humidity()
+    pascals = sensor.read_pressure()
+    hectopascals = pascals / 100
+    print '{0:0.1f}\n{1}\n{2:0.2f}'.format(temperature, int(humidity), hectopascals)
 except RuntimeError as e:
     print 'error\n{0}'.format(e)
 except:

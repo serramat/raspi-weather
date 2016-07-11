@@ -20,7 +20,7 @@ var db = {
 
         var hourString = -hours + ' hours';
         var stmt = db.connection.prepare(
-            'SELECT timestamp, temperature, humidity FROM indoor WHERE timestamp >= datetime(?, ?, ?)',
+            'SELECT timestamp, temperature, humidity, pressure FROM indoor WHERE timestamp >= datetime(?, ?, ?)',
             function(err) {
                 if(err) {
                     db.errorHandler(err, res);
@@ -56,7 +56,7 @@ var db = {
         db.connection.serialize(function() {
             if(firstType === 'today') {
                 var stmt = db.connection.prepare(
-                    'SELECT timestamp, temperature, humidity FROM indoor WHERE timestamp >= datetime(?, ?, ?)',
+                    'SELECT timestamp, temperature, humidity, pressure FROM indoor WHERE timestamp >= datetime(?, ?, ?)',
                     function(err) {
                         if(err) {
                             db.errorHandler(err, res);
@@ -77,7 +77,7 @@ var db = {
 
             if(secondType === 'yesterday') {
                 var stmt = db.connection.prepare(
-                    'SELECT timestamp, temperature, humidity\
+                    'SELECT timestamp, temperature, humidity, pressure\
                     FROM indoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
                     AND timestamp <= datetime($now, $timezone, $start)',
                     function(err) {
