@@ -215,7 +215,8 @@ function loadChart(APICall, DOMtarget, moreOptions) {
 
         // End the plotband if currently it's night
         var last = options.xAxis.plotBands.length - 1;
-        if(options.xAxis.plotBands[last].to === null) {
+        if(options.xAxis.plotBands[last] != null &&
+           options.xAxis.plotBands[last].to === null) {
             // TODO: tesztelni!
             var lastTimestamp = json.data[json.data.length-1].timestamp;
             options.xAxis.plotBands[last].to = moment.utc(lastTimestamp).local().valueOf();
@@ -446,10 +447,16 @@ function computeStats() {
     var $stats = $('#stats');
     $stats.empty();
 
-    var day = $('#chart-today-vs').highcharts().series;
-    var interval = $('#chart-past').highcharts().series;
+    var day, interval;
+    if ($('#chart-today-vs').highcharts() != undefined) {
+        day = $('#chart-today-vs').highcharts().series;
+    }
+    if (('#chart-past').highcharts != null) {
+        interval = $('#chart-past').highcharts().series;
+    }
     var intervalType = $('#dropdown-label-past').data('intervalType');
     
+    if (day != undefined) {
     // Today:
     stats.today.temperature.min = day[0].dataMin;
     stats.today.temperature.max = day[0].dataMax;
@@ -495,6 +502,7 @@ function computeStats() {
     $stats.append('<tr><th class="sub">avg</th><td>' + todayHumArrow + stats.today.humidity.avg + '%</td><td>' + stats.interval.humidity.avg + '%</td></tr>');
     $stats.append('<tr><th class="sub">min</th><td>' + stats.today.humidity.min + '%</td><td>' + stats.interval.humidity.min + '%</td></tr>');
     $stats.append('<tr><th class="sub">max</th><td>' + stats.today.humidity.max + '%</td><td>' + stats.interval.humidity.max + '%</td></tr>');
+}
 }
 
 function autoReload() {
