@@ -60,7 +60,7 @@ var globalHighchartsOptions = {
         zoomType: 'x',
         // To prevent the humidity axis to have ticks over 100:
         alignTicks: false, 
-        marginLeft: 50,
+        marginLeft: 110,
         marginRight: 50,
         events: {
             load: chartComplete
@@ -96,6 +96,19 @@ var globalHighchartsOptions = {
         max: 100,
         // To prevent the humidity axis to have unrealistic ticks: only 0, 50, 100
         tickAmount: 3
+    },
+    {
+        title: {
+            text: 'Pressure (hPa)',
+            margin: 5,
+            style: {
+                fontWeight: 'bold'
+            }
+        },
+        offset: 50,
+        min: 990,
+        max: 1040,
+        tickInterval: 50
     }],
     series: [{
             name: 'Temperature',
@@ -133,7 +146,20 @@ var globalHighchartsOptions = {
                 valueSuffix: '%'
             },
             color: '#869BCE'
+        },
+        {
+            name: 'Pressure',
+            yAxis: 2,
+            data: [],
+            marker: {
+                enabled: false
+            },
+            tooltip: {
+                valueSuffix: 'hPa'
+            },
+            color: '#55d0a1'
         }
+
     ],
     legend: {
         align: 'left',
@@ -184,7 +210,7 @@ function loadChart(APICall, DOMtarget, moreOptions) {
         var options = $.extend(true, {}, globalHighchartsOptions, moreOptions);
 
         $.each(json.data, function(index, el) {
-            var m = moment.utc(el.timestamp).local();
+            var m = moment.utc(el.timestamp, 'ddd MMM DD HH:mm:ss YYYY').local();
 
             // Populating the series
             options.series[0].data.push([
@@ -195,6 +221,11 @@ function loadChart(APICall, DOMtarget, moreOptions) {
             options.series[1].data.push([
                 m.valueOf(),
                 el.humidity
+            ]);
+
+	    options.series[2].data.push([
+                m.valueOf(),
+                format(el.pressure)
             ]);
 
             // Computing plot bands for the night interval(s)
@@ -215,7 +246,8 @@ function loadChart(APICall, DOMtarget, moreOptions) {
 
         // End the plotband if currently it's night
         var last = options.xAxis.plotBands.length - 1;
-        if(options.xAxis.plotBands[last].to === null) {
+        if(options.xAxis.plotBands[last] != null &&
+           options.xAxis.plotBands[last].to === null) {
             // TODO: tesztelni!
             var lastTimestamp = json.data[json.data.length-1].timestamp;
             options.xAxis.plotBands[last].to = moment.utc(lastTimestamp).local().valueOf();
@@ -361,6 +393,7 @@ function loadCurrentData() {
 
         $('#curr-temp-inside').text(format(json.temperature) + '°');
         $('#curr-hum-inside').text(json.humidity + '%');
+	$('#curr-press-inside').text(json.pressure + ' hPa');
     });
 }
 
@@ -372,6 +405,8 @@ function chartComplete() {
         // Delay the current weather request until the others (charts) have completed,
         // because it takes a long time and slows down poor little Pi :(
         loadCurrentData();
+        // also load weather info from forecast.io
+	loadOutsideWeather();
     }
 
     if(this.options.doStats) {
@@ -432,6 +467,7 @@ function loadOutsideWeather() {
         function(json) {            
             $('#curr-temp-outside').text(format(json.currently.temperature.toFixed(1)) + '°');
             $('#curr-hum-outside').text((json.currently.humidity*100).toFixed() + '%');
+            $('#curr-press-outside').text(format(json.currently.pressure.toFixed(1)) + ' hPa');	    
 
             $('#forecast-summary').text(json.hourly.summary);
             $('#forecast-link').attr('href', 'http://forecast.io/#/f/' +
@@ -443,10 +479,16 @@ function computeStats() {
     var $stats = $('#stats');
     $stats.empty();
 
-    var day = $('#chart-today-vs').highcharts().series;
-    var interval = $('#chart-past').highcharts().series;
+    var day, interval;
+    if ($('#chart-today-vs').highcharts() != undefined) {
+        day = $('#chart-today-vs').highcharts().series;
+    }
+    if (('#chart-past').highcharts != null) {
+        interval = $('#chart-past').highcharts().series;
+    }
     var intervalType = $('#dropdown-label-past').data('intervalType');
     
+    if (day != undefined) {
     // Today:
     stats.today.temperature.min = day[0].dataMin;
     stats.today.temperature.max = day[0].dataMax;
@@ -492,6 +534,7 @@ function computeStats() {
     $stats.append('<tr><th class="sub">avg</th><td>' + todayHumArrow + stats.today.humidity.avg + '%</td><td>' + stats.interval.humidity.avg + '%</td></tr>');
     $stats.append('<tr><th class="sub">min</th><td>' + stats.today.humidity.min + '%</td><td>' + stats.interval.humidity.min + '%</td></tr>');
     $stats.append('<tr><th class="sub">max</th><td>' + stats.today.humidity.max + '%</td><td>' + stats.interval.humidity.max + '%</td></tr>');
+}
 }
 
 function autoReload() {
@@ -561,18 +604,18 @@ $(document).ready(function() {
 
 
     $('#btn-reload-inside').on('click', function() {
-        $('#curr-temp-inside, #curr-hum-inside').text('...');
+        $('#curr-temp-inside, #curr-hum-inside, #curr-press-inside').text('...');
         loadCurrentData();
     });
 
     $('#btn-reload-outside').on('click', function() {
-        $('#curr-temp-outside, #curr-hum-outside').text('...');
+        $('#curr-temp-outside, #curr-hum-outside, #curr-press-outside').text('...');
         loadOutsideWeather();
     });
 
     $('#btn-reload-all').on('click', function() {
         $('#error-container').empty();
-        $('#curr-temp-outside, #curr-hum-outside, #curr-temp-inside, #curr-hum-inside, #forecast-summary').text('...');
+        $('#curr-temp-outside, #curr-hum-outside, #curr-press-outside, #curr-temp-inside, #curr-hum-inside, #curr-press-inside, #forecast-summary').text('...');
         $('#chart-today-vs, #chart-past').each(function(i, el) {
             if ($(el).highcharts()) {
                 // It might be uninitialized due to a previous error (eg. network error)
