@@ -105,10 +105,7 @@ var globalHighchartsOptions = {
                 fontWeight: 'bold'
             }
         },
-        offset: 50,
-        min: 990,
-        max: 1040,
-        tickInterval: 50
+        offset: 50
     }],
     series: [{
             name: 'Temperature',
