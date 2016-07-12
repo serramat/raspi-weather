@@ -179,6 +179,9 @@ var stats = {
         },
         humidity: {
             avg: 0
+        },
+        pressure: {
+            avg: 0
         }
     },
     interval: {
@@ -186,6 +189,9 @@ var stats = {
             avg: 0
         },
         humidity: {
+            avg: 0
+        },
+        pressure: {
             avg: 0
         }
     },
@@ -324,6 +330,21 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
             dashStyle: 'shortdot'
         });
 
+	options.series.push({
+            name: 'Pressure yesterday',
+            yAxis: 2,
+            data: [],
+            lineWidth: 2,
+            marker: {
+                enabled: false
+            },
+            tooltip: {
+                valueSuffix: 'hPa'
+            },
+            color: '#55d0a1',
+            dashStyle: 'shortdot'
+        });
+
         // Today
         $.each(json.first.data, function(index, el) {
             // We are cheating here a little to have a nice graph:
@@ -344,19 +365,27 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
                 m.valueOf(),
                 el.humidity
             ]);
+            options.series[2].data.push([
+                m.valueOf(),
+                format(el.pressure)
+            ]);
         });
 
         // Yesterday
         $.each(json.second.data, function(index, el) {
             // The same rounding as above with today's data
             var m = moment.utc(el.timestamp).local().seconds(0);
-            options.series[2].data.push([
+            options.series[3].data.push([
                 m.valueOf(),
                 format(el.temperature)
             ]);
-            options.series[3].data.push([
+            options.series[4].data.push([
                 m.valueOf,
                 el.humidity
+            ]);
+            options.series[5].data.push([
+                m.valueOf(),
+                format(el.pressure)
             ]);
         });
 
@@ -496,36 +525,46 @@ function computeStats() {
     stats.today.temperature.max = day[0].dataMax;
     stats.today.humidity.min = day[1].dataMin;
     stats.today.humidity.max = day[1].dataMax;
+    stats.today.pressure.min = day[2].dataMin;
+    stats.today.pressure.max = day[2].dataMax;
     stats.today.temperature.avg = 0;
     stats.today.humidity.avg = 0;
+    stats.today.pressure.avg = 0;
 
     for(var i = 0; i < day[0].data.length; i++) {
         stats.today.temperature.avg += parseInt(day[0].data[i].y);
         stats.today.humidity.avg += parseInt(day[1].data[i].y);
+    	stats.today.pressure.avg += parseInt(day[2].data[i].y);
     }
     stats.today.temperature.avg = (stats.today.temperature.avg / day[0].data.length).toFixed(1);
     stats.today.humidity.avg = (stats.today.humidity.avg / day[1].data.length).toFixed(1);
+    stats.today.pressure.avg = (stats.today.pressure.avg / day[2].data.length).toFixed(1);
 
     // Last [selected] interval:
     stats.interval.temperature.min = interval[0].dataMin;
     stats.interval.temperature.max = interval[0].dataMax;
     stats.interval.humidity.min = interval[1].dataMin;
     stats.interval.humidity.max = interval[1].dataMax;
+    stats.interval.pressure.min = interval[2].dataMin;
+    stats.interval.pressure.max = interval[2].dataMax;
     stats.interval.temperature.avg = 0;
     stats.interval.humidity.avg = 0;
+    stats.interval.pressure.avg = 0;
 
     for(var i = 0; i < interval[0].data.length; i++) {
         stats.interval.temperature.avg += parseInt(interval[0].data[i].y);
         stats.interval.humidity.avg += parseInt(interval[1].data[i].y);
+        stats.interval.pressure.avg += parseInt(interval[2].data[i].y);
     }
     stats.interval.temperature.avg = (stats.interval.temperature.avg / interval[0].data.length).toFixed(1);
     stats.interval.humidity.avg = (stats.interval.humidity.avg / interval[1].data.length).toFixed(1);
+    stats.interval.pressure.avg = (stats.interval.pressure.avg / interval[2].data.length).toFixed(1);
 
     var up = '<span class="up-arrow" title="Compared to the selected interval\'s average">&#9650</span>';
     var down = '<span class="down-arrow" title="Compared to the selected interval\'s average">&#9660</span>';
     var todayTempArrow = (stats.today.temperature.avg > stats.interval.temperature.avg) ? up : down;
     var todayHumArrow = (stats.today.humidity.avg > stats.interval.humidity.avg) ? up : down;
-
+    var todayPressArrow = (stats.today.pressure.avg > stats.interval.pressure.avg) ? up : down;
 
 
     $stats.append('<tr><th>Temperature</th><th>today</th><th>' + intervalType + '</th></tr>');
@@ -536,6 +575,10 @@ function computeStats() {
     $stats.append('<tr><th class="sub">avg</th><td>' + todayHumArrow + stats.today.humidity.avg + '%</td><td>' + stats.interval.humidity.avg + '%</td></tr>');
     $stats.append('<tr><th class="sub">min</th><td>' + stats.today.humidity.min + '%</td><td>' + stats.interval.humidity.min + '%</td></tr>');
     $stats.append('<tr><th class="sub">max</th><td>' + stats.today.humidity.max + '%</td><td>' + stats.interval.humidity.max + '%</td></tr>');
+    $stats.append('<tr><th>Pressure</th><th>today</th><th>' + intervalType + '</th></tr>');
+    $stats.append('<tr><th class="sub">avg</th><td>' + todayPressArrow + stats.today.pressure.avg + ' hPa</td><td>' + stats.interval.pressure.avg + ' hPa</td></tr>');
+    $stats.append('<tr><th class="sub">min</th><td>' + stats.today.pressure.min + ' hPa</td><td>' + stats.interval.pressure.min + ' hPa</td></tr>');
+    $stats.append('<tr><th class="sub">max</th><td>' + stats.today.pressure.max + ' hPa</td><td>' + stats.interval.pressure.max + ' hPa</td></tr>');
 } else {
     //if no stats are available, load other info
     loadCurrentData();
