@@ -607,7 +607,7 @@ $(document).ready(function() {
     // Init
     Highcharts.setOptions({
         global: {
-            useUTC: false
+            useUTC: true
         }
     });
     
