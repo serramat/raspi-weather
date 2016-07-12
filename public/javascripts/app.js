@@ -499,9 +499,11 @@ function loadOutsideWeather() {
 	    $('#prec-prob-outside').text(format(100*json.currently.precipProbability.toFixed(1)) + '%');
             $('#prec-int-outside').text(format(json.currently.precipIntensity.toFixed(1)) + ' mm/h');    
 	    var precType = json.currently.precipType;
-            precType = precType.charAt(0).toUpperCase() + precType.slice(1);
-	    $('#prec-type-outside').text(format(precType));		
-
+            if (precType != undefined) {
+                precType = precType.charAt(0).toUpperCase() + precType.slice(1);
+	        $('#prec-type-outside').text(format(precType));		
+            }
+            
             $('#forecast-summary').text(json.hourly.summary);
             $('#forecast-link').attr('href', 'http://forecast.io/#/f/' +
                 config.latitude + ',' + config.longitude);
