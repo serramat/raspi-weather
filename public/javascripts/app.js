@@ -467,6 +467,9 @@ function loadOutsideWeather() {
             $('#curr-press-outside').text(format(json.currently.pressure.toFixed(1)) + ' hPa');	    
 	    $('#prec-prob-outside').text(format(100*json.currently.precipProbability.toFixed(1)) + '%');
             $('#prec-int-outside').text(format(json.currently.precipIntensity.toFixed(1)) + ' mm/h');    
+	    var precType = json.currently.precipType;
+            precType = precType.charAt(0).toUpperCase() + precType.slice(1);
+	    $('#prec-type-outside').text(format(precType));		
 
             $('#forecast-summary').text(json.hourly.summary);
             $('#forecast-link').attr('href', 'http://forecast.io/#/f/' +
@@ -533,6 +536,10 @@ function computeStats() {
     $stats.append('<tr><th class="sub">avg</th><td>' + todayHumArrow + stats.today.humidity.avg + '%</td><td>' + stats.interval.humidity.avg + '%</td></tr>');
     $stats.append('<tr><th class="sub">min</th><td>' + stats.today.humidity.min + '%</td><td>' + stats.interval.humidity.min + '%</td></tr>');
     $stats.append('<tr><th class="sub">max</th><td>' + stats.today.humidity.max + '%</td><td>' + stats.interval.humidity.max + '%</td></tr>');
+} else {
+    //if no stats are available, load other info
+    loadCurrentData();
+    loadOutsideWeather();
 }
 }
 
@@ -608,13 +615,13 @@ $(document).ready(function() {
     });
 
     $('#btn-reload-outside').on('click', function() {
-        $('#curr-temp-outside, #curr-hum-outside, #curr-press-outside, #prec-prob-outside, #prec-int-outside').text('...');
+        $('#curr-temp-outside, #curr-hum-outside, #curr-press-outside, #prec-prob-outside, #prec-int-outside, #prec-type-outside').text('...');
         loadOutsideWeather();
     });
 
     $('#btn-reload-all').on('click', function() {
         $('#error-container').empty();
-        $('#curr-temp-outside, #curr-hum-outside, #curr-press-outside, #prec-prob-outside, #prec-int-outside, #curr-temp-inside, #curr-hum-inside, #curr-press-inside, #forecast-summary').text('...');
+        $('#curr-temp-outside, #curr-hum-outside, #curr-press-outside, #prec-prob-outside, #prec-int-outside, #prec-type-outside, #curr-temp-inside, #curr-hum-inside, #curr-press-inside, #forecast-summary').text('...');
         $('#chart-today-vs, #chart-past').each(function(i, el) {
             if ($(el).highcharts()) {
                 // It might be uninitialized due to a previous error (eg. network error)
