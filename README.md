@@ -1,20 +1,18 @@
 # Raspberry Pi weather station
 
-TODO: Update README !!!!
-This is a fork of https://github.com/ofalvai/raspi-weather, adapted for Adafruit's BME280 sensor.
+(Original project: https://github.com/ofalvai/raspi-weather)
 
-
-DHT22 temperature/humidity sensor logger and browser dashboard for the Raspberry Pi. Based on [Adafruit's DHT22 Python library](https://github.com/adafruit/Adafruit_Python_DHT).
+BME280 temperature/humidity/pressure sensor logger and browser dashboard for the Raspberry Pi. Based on [Adafruit's BME280 Python library](https://github.com/adafruit/Adafruit_Python_BME280).
 
 ![Screenshot](/public/images/screenshot.png?raw=true)
 
 # Features
 
-- Measure and store temperature and humidity periodically (via cron and sqlite)
+- Measure and store temperature, humidity and pressure periodically (via cron and sqlite)
 - Responsive web dashboard
-- Display current temperature and humidity
-- Display logged temperature and humidity graphs
-- Current outside weather via [Forecast.io](http://forecast.io)
+- Display current temperature, humidity and pressure
+- Display logged temperature, humidity and pressure graphs
+- Other weather info via [Forecast.io](http://forecast.io)
 
 # Installation
 
@@ -22,12 +20,12 @@ DHT22 temperature/humidity sensor logger and browser dashboard for the Raspberry
 sudo apt-get install sqlite3
 wget http://node-arm.herokuapp.com/node_latest_armhf.deb
 sudo dpkg -i node_latest_armhf.deb
-git clone git@github.com:ofalvai/raspi-weather.git
+git clone https://github.com/dventurino/raspi-weather.git
 cd raspi-weather
 npm install
 ```
 
-Install Adafruit's DHT22 Python library [according to their instructions](https://github.com/adafruit/Adafruit_Python_DHT#adafruit-python-dht-sensor-library).
+Install Adafruit's BME280 Python library [according to their instructions](https://github.com/adafruit/Adafruit_Python_BME280.git).
 
 Edit your sudo crontab with `sudo crontab -e` (yes, it needs to run as root to access GPIO, use at your own risk), and add this line:
 
@@ -37,7 +35,7 @@ Edit your sudo crontab with `sudo crontab -e` (yes, it needs to run as root to a
 
 ...assuming you want to take measurements every 30 minutes, and cloned into `/home/pi`.
 
-Connect your DHT22 sensor to the Pi and set the pin variable in `sensor_scripts/current.py` and `sensor_scripts/logger.py` to the pin number you use.
+Connect your BME280 sensor to the Pi, copy Adafruit_BME280.py in sensors and set the correct BME280 default address.
 
 You can test both scripts by running `sudo sensor_scripts/current.py` and `sudo sensor_scripts/logger.py`. The latter will create the sqlite database file in the project root and log the first measurement.
 
@@ -56,6 +54,8 @@ sudo nohup node app.js &
 ```
 
 ...or you can install [forever](https://github.com/foreverjs/forever) to keep it _always_ running and then `sudo forever start app.js`
+
+...or you can add its init script to make it start at boot.
 
 The server runs on port 3000, so visit for example `http://192.168.0.100:3000`
 

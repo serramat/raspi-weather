@@ -40,7 +40,7 @@
                     </li>
                   </ul>
                   <ul class="nav navbar-nav navbar-right">
-                    <li><a href="https://github.com/ofalvai/raspi-weather" target="_blank">GitHub</a></li>
+                    <li><a href="https://github.com/dventurino/raspi-weather" target="_blank">GitHub</a></li>
                   </ul>
                 </div>
               </div>
@@ -66,7 +66,7 @@
                             </div>
                         </div>
                         <div class="panel-footer">
-                            <span class="pull-left">Currently inside</span>
+                            <span class="pull-left">BME280 Sensor</span>
                             <span id="btn-reload-inside" class="pull-right btn-reload-small"><i class="fa fa-refresh"></i></span>
                             <div class="clearfix"></div>
                         </div>
@@ -79,7 +79,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-tree fa-5x"></i>
+                                    <i class="fa fa-globe fa-5x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div id="curr-temp-outside" class="huge"></div>
@@ -89,7 +89,7 @@
                             </div>
                         </div>
                         <div class="panel-footer">
-                            <span class="pull-left">Currently Outside</span>
+                            <span class="pull-left">Forecast.io</span>
                             <span id="btn-reload-outside" class="pull-right btn-reload-small"><i class="fa fa-refresh"></i></span>
                             <div class="clearfix"></div>
                         </div>
@@ -106,6 +106,8 @@
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div id="forecast-summary"></div>
+                                    <div>Precipitation probability: <span id="prec-prob-outside"></span></div>
+                                    <div>Precipitation intensity: <span id="prec-int-outside"></span></div>
                                 </div>
                             </div>
                         </div>
