@@ -44,6 +44,8 @@ var config = {
      * Please don't abuse this. Be a good guy and request your own at http://developer.forecast.io
      */
     APIKey: '262d0436a1b2d47e7593f0bb41491b64',
+    /* Forecast.io language for data retrieval */
+    lang: 'en',
 
     // Limits of the night plotband (the gray area on the graphs)
     nightStart: 0,
@@ -489,7 +491,7 @@ function loadOutsideWeather() {
         config.APIKey + '/' +
         config.latitude + ',' +
         config.longitude +
-        '/?units=si&exclude=minutely,daily,alerts,flags&callback=?',
+        '/?units=si&lang='+config.lang+'&exclude=minutely,daily,alerts,flags&callback=?',
         function(json) {            
             $('#curr-temp-outside').text(format(json.currently.temperature.toFixed(1)) + '°');
             $('#curr-hum-outside').text((json.currently.humidity*100).toFixed() + '%');
