@@ -49,7 +49,7 @@ var config = {
 
     // Limits of the night plotband (the gray area on the graphs)
     nightStart: 0,
-    nightEnd: 7,
+    nightEnd: 9,
 
     // Used in chartComplete() to delay loading current sensor data
     numOfCharts: 2,
@@ -215,7 +215,7 @@ function loadChart(APICall, DOMtarget, moreOptions) {
         var options = $.extend(true, {}, globalHighchartsOptions, moreOptions);
 
         $.each(json.data, function(index, el) {
-            var m = moment.utc(el.timestamp, 'ddd MMM DD HH:mm:ss YYYY').local();
+            var m = moment.utc(el.timestamp, 'YYYY-MM-DD HH:mm:ss').local();
 
             // Populating the series
             options.series[0].data.push([
@@ -244,7 +244,8 @@ function loadChart(APICall, DOMtarget, moreOptions) {
             }
             // Night end
             // TODO: ha kimaradás van, akkor ez nem teljesül, a moments összehasonlítás jobb lenne
-            if (m.hours() === config.nightEnd && m.minutes() === 0) {
+            if (options.xAxis.plotBands.length > 0
+                && m.hours() === config.nightEnd && m.minutes() === 0) {
                 options.xAxis.plotBands[options.xAxis.plotBands.length-1].to = m.valueOf();
             }
         });
@@ -382,7 +383,7 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
                 format(el.temperature)
             ]);
             options.series[4].data.push([
-                m.valueOf,
+                m.valueOf(),
                 el.humidity
             ]);
             options.series[5].data.push([
@@ -396,7 +397,6 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
         options.xAxis.labels = {
             format: '{value: %H:%M}'
         };
-        options.series[3].visible = false;
 
         // Adding a red vertical marker at the last measurement
         // The same subtraction as above
@@ -518,7 +518,7 @@ function computeStats() {
     if ($('#chart-today-vs').highcharts() != undefined) {
         day = $('#chart-today-vs').highcharts().series;
     }
-    if (('#chart-past').highcharts != null) {
+    if ($('#chart-past').highcharts() != undefined) {
         interval = $('#chart-past').highcharts().series;
     }
     var intervalType = $('#dropdown-label-past').data('intervalType');
