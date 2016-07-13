@@ -7,7 +7,7 @@ degrees = sensor.read_temperature()
 pascals = sensor.read_pressure()
 hectopascals = pascals / 100
 humidity = sensor.read_humidity()
-timestamp = time.ctime()
+timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 
 print 'Timestamp = %s'%timestamp + ', Temp = {0:0.3f} deg C'.format(degrees) + ', Pressure = {0:0.2f} hPa'.format(hectopascals) + ', Humidity = {0:0.2f} %'.format(humidity)
 
