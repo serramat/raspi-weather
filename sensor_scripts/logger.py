@@ -3,9 +3,14 @@ import time
 
 sensor = BME280(mode=BME280_OSAMPLE_8)
 
+# Altitude in meters to calculate sea-level pressure
+altitude = 93
+
 degrees = sensor.read_temperature()
 pascals = sensor.read_pressure()
 hectopascals = pascals / 100
+# Adjust pressure to sea level
+hectopascals = hectopascals*(1-(0.0065 * altitude)/(degrees + 0.0065 * altitude + 273.15))**(-5.257)
 humidity = sensor.read_humidity()
 timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 
