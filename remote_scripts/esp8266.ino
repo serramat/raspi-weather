@@ -1,7 +1,7 @@
 /***************************************************************************
   This is a library for the BME280 humidity, temperature & pressure sensor
   which sends measurements to RasPi-Weather
-  
+
   https://github.com/dventurino/raspi-weather
  ***************************************************************************/
 
@@ -11,31 +11,23 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-
-#define BME_SCK 13
-#define BME_MISO 12
-#define BME_MOSI 11
-#define BME_CS 10
-
 #define ALTITUDE (93)
 
 Adafruit_BME280 bme; // I2C
-//Adafruit_BME280 bme(BME_CS); // hardware SPI
-//Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO,  BME_SCK);
 
-const char* ssid     = "Network_SSID";
+const char* ssid     = "SSID";
 const char* password = "password";
 
-const char* host = "192.168.1.1";
+const char* host = "192.168.1.10";
 /*
-const char* streamId   = "....................";
-const char* privateKey = "....................";
+  const char* streamId   = "....................";
+  const char* privateKey = "....................";
 */
 
 void setup() {
-   // Initialize the LED_BUILTIN pin as an output
+  // Initialize the LED_BUILTIN pin as an output
   pinMode(LED_BUILTIN, OUTPUT);
-   
+
   Serial.begin(115200);
 
   delay(10);
@@ -59,9 +51,9 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // connect to BME280 sensor
-  if (!bme.begin()) {
+  if (!bme.begin(0x76)) {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    //while (1);
+    while (1);
   }
 }
 
@@ -69,7 +61,7 @@ void loop() {
 
   // Turn the LED on
   digitalWrite(LED_BUILTIN, LOW);
-  
+
   float temperature = bme.readTemperature();
   float pressure = bme.readPressure() / 100.0F;
   // Adjust pressure to sea level
@@ -117,27 +109,27 @@ void loop() {
   // We now create a URI for the request
   String url = "/input/";
   /*
-  url += streamId;
-  url += "?private_key=";
-  url += privateKey;
-  url += "&value=";
-  url += value;
+    url += streamId;
+    url += "?private_key=";
+    url += privateKey;
+    url += "&value=";
+    url += value;
   */
   Serial.print("Requesting URL: ");
   Serial.println(url);
 
   client.print(jsonValues);
   /*
-  unsigned long timeout = millis();
-  while (client.available() == 0) {
+    unsigned long timeout = millis();
+    while (client.available() == 0) {
     if (millis() - timeout > 5000) {
       Serial.println(">>> Client Timeout !");
       client.stop();
       return;
     }
-  }
+    }
   */
-  
+
   // Read all the lines of the reply from server and print them to Serial
   while (client.available()) {
     String line = client.readStringUntil('\r');
@@ -149,16 +141,16 @@ void loop() {
 
   // Turn the LED off
   digitalWrite(LED_BUILTIN, HIGH);
-  
+
   // go to sleep for 30 minutes
-     delay(1800000);
+  delay(1800000);
   // TODO deep sleep mode; see
   // https://github.com/esp8266/Arduino/blob/d6e38f0abd2e1bf796a32e8b1a24d37fdc7daaf8/doc/libraries.md
   /*
-   * ESP.deepSleep(microseconds, mode) will put the chip into deep 
-   * sleep. mode is one of 
-   * WAKE_RF_DEFAULT, WAKE_RFCAL, WAKE_NO_RFCAL, WAKE_RF_DISABLED. 
-   * (GPIO16 needs to be tied to RST to wake from deepSleep.)
-   */
-  // ESP.deepSleep(5e6);
+     ESP.deepSleep(microseconds, mode) will put the chip into deep
+     sleep. mode is one of
+     WAKE_RF_DEFAULT, WAKE_RFCAL, WAKE_NO_RFCAL, WAKE_RF_DISABLED.
+     (GPIO16 needs to be tied to RST to wake from deepSleep.)
+  */
+  //ESP.deepSleep(1e+7, WAKE_RF_DEFAULT);
 }
