@@ -17,7 +17,7 @@ var sensor = {
             };
         }
     },
-    getLast: function (sensor_ip) {
+    getLast: function () {
         var result = execSync('./sensor_scripts/last_measure.py').toString().split('\n');
         if (result[0] === 'error') {
             return {
