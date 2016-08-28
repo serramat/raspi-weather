@@ -18,17 +18,17 @@ Adafruit_BME280 bme; // I2C
 const char* ssid     = "SSID";
 const char* password = "password";
 
-const char* host = "192.168.1.10";
+const char* host = "192.168.1.1";
 /*
   const char* streamId   = "....................";
   const char* privateKey = "....................";
 */
 
 void setup() {
+  Serial.begin(115200);
+
   // Initialize the LED_BUILTIN pin as an output
   pinMode(LED_BUILTIN, OUTPUT);
-
-  Serial.begin(115200);
 
   delay(10);
 
@@ -119,16 +119,14 @@ void loop() {
   Serial.println(url);
 
   client.print(jsonValues);
-  /*
-    unsigned long timeout = millis();
-    while (client.available() == 0) {
+  unsigned long timeout = millis();
+  while (client.available() == 0) {
     if (millis() - timeout > 5000) {
       Serial.println(">>> Client Timeout !");
       client.stop();
       return;
     }
-    }
-  */
+  }
 
   // Read all the lines of the reply from server and print them to Serial
   while (client.available()) {
@@ -144,6 +142,7 @@ void loop() {
 
   // go to sleep for 30 minutes
   delay(1800000);
+  
   // TODO deep sleep mode; see
   // https://github.com/esp8266/Arduino/blob/d6e38f0abd2e1bf796a32e8b1a24d37fdc7daaf8/doc/libraries.md
   /*
