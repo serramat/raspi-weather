@@ -1,5 +1,12 @@
 var config = {
     /**
+     * Operation mode.
+     * false: use BME280 sensor directly connected to raspberry's GPIO pins.
+     * true: use data collected from remote sensors.
+     */
+    remoteSensorMode: true,
+
+    /**
      * Frequency of measurement in minutes
      * Note: it's only needed for the graph intervals, doesn't set the logging interval.
      * You have to edit your crontab for that.
@@ -425,6 +432,19 @@ function loadCurrentData() {
     });
 }
 
+function loadLastData() {
+    $.getJSON('/api/last', function(json) {
+        if(!json.success) {
+            displayError(json.error, '#error-container');
+            return;
+        }
+
+        $('#curr-temp-inside').text(format(json.temperature) + '°');
+        $('#curr-hum-inside').text(json.humidity + '%');
+	$('#curr-press-inside').text(json.pressure + ' hPa');
+    });
+}
+
 function chartComplete() {
     // Fired at Highchars' load event
     // 'this' points to the Highcharts object
@@ -432,7 +452,11 @@ function chartComplete() {
     if(config.loadedCharts.length === config.numOfCharts) {
         // Delay the current weather request until the others (charts) have completed,
         // because it takes a long time and slows down poor little Pi :(
-        loadCurrentData();
+        if (config.remoteSensorMode == false) {
+            loadCurrentData();
+        } else {
+            loadLastData();
+        }
         // also load weather info from forecast.io
 	loadOutsideWeather();
     }
@@ -585,7 +609,11 @@ function computeStats() {
     $stats.append('<tr><th class="sub">max</th><td>' + stats.today.pressure.max + ' hPa</td><td>' + stats.interval.pressure.max + ' hPa</td></tr>');
 } else {
     //if no stats are available, load other info
-    loadCurrentData();
+     if (config.remoteSensorMode == false) {
+        loadCurrentData();
+    } else {
+        loadLastData();
+    }
     loadOutsideWeather();
 }
 }
@@ -658,7 +686,11 @@ $(document).ready(function() {
 
     $('#btn-reload-inside').on('click', function() {
         $('#curr-temp-inside, #curr-hum-inside, #curr-press-inside').text('...');
-        loadCurrentData();
+        if (config.remoteSensorMode == false) {
+           loadCurrentData();
+       } else {
+           loadLastData();
+       }
     });
 
     $('#btn-reload-outside').on('click', function() {

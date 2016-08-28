@@ -25,6 +25,8 @@ cd raspi-weather
 npm install
 ```
 
+LOCAL SENSOR MODE:
+
 Install Adafruit's BME280 Python library [according to their instructions](https://github.com/adafruit/Adafruit_Python_BME280.git).
 
 Edit your sudo crontab with `sudo crontab -e` (yes, it needs to run as root to access GPIO, use at your own risk), and add this line:
@@ -38,6 +40,17 @@ Edit your sudo crontab with `sudo crontab -e` (yes, it needs to run as root to a
 Connect your BME280 sensor to the Pi, copy Adafruit_BME280.py in sensors and set the correct BME280 default address.
 
 You can test both scripts by running `sudo sensor_scripts/current.py` and `sudo sensor_scripts/logger.py`. The latter will create the sqlite database file in the project root and log the first measurement.
+
+REMOTE SENSOR MODE:
+Edit your sudo crontab with sudo crontab -e and add this line:
+
+```
+/usr/bin/python ~/raspi-weather/sensor_scripts/server_socket.py
+```
+
+This is to start the socket listening process on startup, il will listen for sensors messages on port 3080 and it will save received measures in the DB.
+
+CONFIGURATION:
 
 You can further tweak the frontend settings in `public/javascripts/app.js`, like:
 

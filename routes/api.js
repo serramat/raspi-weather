@@ -8,6 +8,12 @@ router.get('/current', function(req, res) {
     res.json(sensor.getCurrent());
 });
 
+/* GET last sensor data. */
+router.get('/last', function(req, res) {
+    res.json(sensor.getLast());
+});
+
+
 /* GET past 24h */
 router.get('/past/24h', function(req, res) {
     // Callback...
