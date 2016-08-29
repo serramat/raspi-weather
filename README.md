@@ -42,10 +42,11 @@ Connect your BME280 sensor to the Pi, copy Adafruit_BME280.py in sensors and set
 You can test both scripts by running `sudo sensor_scripts/current.py` and `sudo sensor_scripts/logger.py`. The latter will create the sqlite database file in the project root and log the first measurement.
 
 REMOTE SENSOR MODE:
-Edit your sudo crontab with sudo crontab -e and add this line:
+Edit your /etc/rc.local file and add this line:
 
 ```
-/usr/bin/python ~/raspi-weather/sensor_scripts/server_socket.py
+# open RasPi-Weather socket for remote sensor
+/home/pi/raspi-weather/sensor_scripts/server_socket.sh > /home/pi/raspi-weather/sensor_scripts/server_socket.log &
 ```
 
 This is to start the socket listening process on startup, il will listen for sensors messages on port 3080 and it will save received measures in the DB.
