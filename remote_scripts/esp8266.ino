@@ -24,6 +24,8 @@ const char* host = "192.168.1.1";
   const char* privateKey = "....................";
 */
 
+bool boot_up = true;
+
 void setup() {
   Serial.begin(115200);
 
@@ -107,18 +109,19 @@ void loop() {
   }
 
   // We now create a URI for the request
-  String url = "/input/";
-  /*
+/*  String url = "/input/";
     url += streamId;
     url += "?private_key=";
     url += privateKey;
     url += "&value=";
     url += value;
-  */
+
   Serial.print("Requesting URL: ");
   Serial.println(url);
-
+*/
+  
   client.print(jsonValues);
+  /*
   unsigned long timeout = millis();
   while (client.available() == 0) {
     if (millis() - timeout > 5000) {
@@ -127,7 +130,7 @@ void loop() {
       return;
     }
   }
-
+  */
   // Read all the lines of the reply from server and print them to Serial
   while (client.available()) {
     String line = client.readStringUntil('\r');
@@ -140,8 +143,14 @@ void loop() {
   // Turn the LED off
   digitalWrite(LED_BUILTIN, HIGH);
 
-  // go to sleep for 30 minutes
-  delay(1800000);
+  if (boot_up == true) {
+    // wair for sensor calibration and send first measurement
+    delay(30000);
+    boot_up = false;
+  } else {
+    // go to sleep for 30 minutes
+    delay(1800000);
+  }
   
   // TODO deep sleep mode; see
   // https://github.com/esp8266/Arduino/blob/d6e38f0abd2e1bf796a32e8b1a24d37fdc7daaf8/doc/libraries.md
