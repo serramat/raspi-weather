@@ -242,7 +242,7 @@ function loadChart(APICall, DOMtarget, moreOptions) {
 
             // Computing plot bands for the night interval(s)
             // Night start
-            if (m.hours() === config.nightStart && m.minutes() === 0) {
+            if (m.hours() === config.nightStart && m.minutes() <= 30) {
                 options.xAxis.plotBands.push({
                     from: m.valueOf(),
                     to: null, // will be stored later
@@ -252,7 +252,7 @@ function loadChart(APICall, DOMtarget, moreOptions) {
             // Night end
             // TODO: ha kimaradás van, akkor ez nem teljesül, a moments összehasonlítás jobb lenne
             if (options.xAxis.plotBands.length > 0
-                && m.hours() === config.nightEnd && m.minutes() === 0) {
+                && m.hours() === config.nightEnd && m.minutes() <= 30) {
                 options.xAxis.plotBands[options.xAxis.plotBands.length-1].to = m.valueOf();
             }
         });
