@@ -26,6 +26,9 @@ const char* host = "192.168.1.1";
 
 bool boot_up = true;
 
+const int MAX_ATTEMPTS = 5;
+int attempts = 0;
+
 void setup() {
   Serial.begin(115200);
 
@@ -104,7 +107,19 @@ void loop() {
   WiFiClient client;
   const int httpPort = 3080;
   if (!client.connect(host, httpPort)) {
-    Serial.println("connection failed");
+    attempts = attempts + 1;
+    Serial.print("Error connecting to server ");
+    Serial.print(host);
+    Serial.print(":");
+    Serial.print(httpPort);
+    Serial.print(" (");
+    Serial.print(attempts);
+    Serial.println(")");
+    if (attempts >= MAX_ATTEMPTS) {
+      attempts = 0;
+      //Reached MAX_ATTEMPTS, retry again after 30 minutes
+      delay(30UL * 60UL * 1000UL); //30 minutes
+    }
     return;
   }
 
@@ -145,11 +160,11 @@ void loop() {
 
   if (boot_up == true) {
     // wair for sensor calibration and send first measurement
-    delay(30000);
+    delay(60000);
     boot_up = false;
   } else {
-    // go to sleep for 30 minutes
-    delay(1800000);
+    // wait for 30 minutes
+    delay(30UL * 60UL * 1000UL); //30 minutes
   }
   
   // TODO deep sleep mode; see
