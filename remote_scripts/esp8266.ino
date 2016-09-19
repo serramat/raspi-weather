@@ -64,6 +64,19 @@ void setup() {
 
 void loop() {
 
+  if (boot_up == true) {
+
+    // Turn the LED on
+    digitalWrite(LED_BUILTIN, LOW);
+
+    // wair for sensor calibration and send first measurement
+    delay(60000);
+    boot_up = false;
+
+    // Turn the LED off
+    digitalWrite(LED_BUILTIN, HIGH);
+  }
+
   // Turn the LED on
   digitalWrite(LED_BUILTIN, LOW);
 
@@ -122,6 +135,10 @@ void loop() {
     }
     return;
   }
+  Serial.println("Connected to server ");
+  Serial.print(host);
+  Serial.print(":");
+  Serial.println(httpPort);
 
   // We now create a URI for the request
 /*  String url = "/input/";
@@ -155,18 +172,15 @@ void loop() {
   Serial.println();
   Serial.println("closing connection");
 
+  client.flush();
+  client.stop();
+
   // Turn the LED off
   digitalWrite(LED_BUILTIN, HIGH);
 
-  if (boot_up == true) {
-    // wair for sensor calibration and send first measurement
-    delay(60000);
-    boot_up = false;
-  } else {
-    // wait for 30 minutes
-    delay(30UL * 60UL * 1000UL); //30 minutes
-  }
-  
+  // wait for 30 minutes
+  delay(30UL * 60UL * 1000UL); //30 minutes
+
   // TODO deep sleep mode; see
   // https://github.com/esp8266/Arduino/blob/d6e38f0abd2e1bf796a32e8b1a24d37fdc7daaf8/doc/libraries.md
   /*
