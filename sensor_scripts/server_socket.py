@@ -10,7 +10,7 @@ dir_path = os.path.dirname(os.path.abspath(__file__))
 f = open(os.path.join(dir_path, log_file), 'a')
 
 HOST = ''
-PORT = 3080
+PORT = 3001
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 f.write('Socket created\n')

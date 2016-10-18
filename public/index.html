@@ -42,7 +42,7 @@
                     </li>
                   </ul>
                   <ul class="nav navbar-nav navbar-right">
-                    <li><a href="https://github.com/dventurino/raspi-weather" target="_blank">GitHub</a></li>
+                    <li><a href="https://github.com/serramat/raspi-weather" target="_blank">GitHub</a></li>
                   </ul>
                 </div>
               </div>
@@ -52,8 +52,31 @@
 
             <!-- Small widgets -->
             <div class="row">
+                <!-- Currently outside Sensor -->
                 <div class="col-lg-3 col-md-3 col-sm-6">
-                    <!-- Currently inside -->
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-globe fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div id="curr-temp" class="huge">°</div>
+                                    <div>Humidity: <span id="curr-hum"></span></div>
+                                    <div>Pressure: <span id="curr-press"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <span class="pull-left">BME280 Sensor - Outside</span>
+                            <span id="btn-reload-outside-sensor" class="pull-right btn-reload-small"><i class="fa fa-refresh"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Currently inside -->
+                <div class="col-lg-3 col-md-3 col-sm-6">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             <div class="row">
@@ -68,12 +91,12 @@
                             </div>
                         </div>
                         <div class="panel-footer">
-                            <span class="pull-left">BME280 Sensor</span>
+                            <span class="pull-left">BME280 Sensor - Inside</span>
                             <span id="btn-reload-inside" class="pull-right btn-reload-small"><i class="fa fa-refresh"></i></span>
                             <div class="clearfix"></div>
                         </div>
                     </div>
-                </div>
+                </div>                
                 
                 <!-- Currently outside -->
                 <div class="col-lg-3 col-md-3 col-sm-6">
@@ -81,7 +104,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-globe fa-5x"></i>
+                                    <i class="fa fa-sun-o fa-5x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div id="curr-temp-outside" class="huge"></div>
@@ -148,6 +171,28 @@
                         </div>
                     </div>
 
+                    <!-- Graph: today vs. yesterday - inside -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Inside: Today vs.
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    <span>yesterday</span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li id="chart-interval-today-vs-inside" class="dropdown-header">Select interval</li>
+                                    <li data-selector="yesterday"><a href="#">yesterday</a></li>
+                                    <!-- <li class="divider" role="separator"></li> -->
+                                    <!-- <li data-selector="custom"><a href="#">custom</a></li> -->
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="highcharts-container" id="chart-today-vs-inside"></div>
+                        </div>
+                    </div>                    
+
                     <!-- Graph: Last week -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -171,6 +216,31 @@
                             <div class="highcharts-container" id="chart-past"></div>
                         </div>
                     </div>
+
+                    <!-- Graph: Last week - inside -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Inside: Last
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    <span id="dropdown-label-past-inside">week</span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul id="chart-interval-past-inside" class="dropdown-menu" role="menu">
+                                    <li class="dropdown-header">Select interval</li>
+                                    <li data-interval="24h"><a href="#">24h</a></li>
+                                    <li data-interval="week"><a href="#">week</a></li>
+                                    <li data-interval="month"><a href="#">month</a></li>
+                                    <!-- <li class="divider" role="separator"></li> -->
+                                    <!-- <li data-interval="custom"><a href="#">custom</a></li> -->
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="highcharts-container" id="chart-past-inside"></div>
+                        </div>
+                    </div>   
+
                 </div>
                 <!-- Right side panels -->
                 <div class="col-lg-4">
@@ -181,7 +251,16 @@
                         </div>
                         <div id="stats" class="panel-body">
                         </div>
-                    </div>        
+                    </div>    
+
+                    <!-- Stats - inside -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Stats Inside
+                        </div>
+                        <div id="stats-inside" class="panel-body">
+                        </div>
+                    </div>                         
                 </div>
             </div>
         </div>

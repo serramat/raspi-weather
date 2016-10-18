@@ -35,4 +35,25 @@ router.get('/compare/today/yesterday', function(req, res) {
     db.getComparison('today', 'yesterday', res);
 });
 
+/* GET past 24h */
+router.get('/past/24h_Indoor', function(req, res) {
+    // Callback...
+    db.getPastIndoor(24, res);
+});
+
+/* GET past week */
+router.get('/past/week_Indoor', function(req, res) {
+    db.getPastIndoor(24*7, res);
+});
+
+/* GET past month */
+router.get('/past/month_Indoor', function(req, res) {
+    db.getPastIndoor(24*30, res);
+});
+
+/* GET yesterday vs today */
+router.get('/compare/today/yesterday_Indoor', function(req, res) {
+    db.getComparisonIndoor('today', 'yesterday', res);
+});
+
 module.exports = router;

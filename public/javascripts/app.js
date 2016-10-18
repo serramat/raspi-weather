@@ -1,12 +1,5 @@
 var config = {
     /**
-     * Operation mode.
-     * false: use BME280 sensor directly connected to raspberry's GPIO pins.
-     * true: use data collected from remote sensors.
-     */
-    remoteSensorMode: true,
-
-    /**
      * Frequency of measurement in minutes
      * Note: it's only needed for the graph intervals, doesn't set the logging interval.
      * You have to edit your crontab for that.
@@ -426,9 +419,9 @@ function loadCurrentData() {
             return;
         }
 
-        $('#curr-temp-inside').text(format(json.temperature) + '°');
-        $('#curr-hum-inside').text(json.humidity + '%');
-	$('#curr-press-inside').text(json.pressure + ' hPa');
+        $('#curr-temp').text(format(json.temperature) + '°');
+        $('#curr-hum').text(json.humidity + '%');
+	    $('#curr-press').text(json.pressure + ' hPa');
     });
 }
 
@@ -441,7 +434,7 @@ function loadLastData() {
 
         $('#curr-temp-inside').text(format(json.temperature) + '°');
         $('#curr-hum-inside').text(json.humidity + '%');
-	$('#curr-press-inside').text(json.pressure + ' hPa');
+	    $('#curr-press-inside').text(json.pressure + ' hPa');
     });
 }
 
@@ -452,18 +445,15 @@ function chartComplete() {
     if(config.loadedCharts.length === config.numOfCharts) {
         // Delay the current weather request until the others (charts) have completed,
         // because it takes a long time and slows down poor little Pi :(
-        if (config.remoteSensorMode == false) {
-            loadCurrentData();
-        } else {
-            loadLastData();
-        }
-        // also load weather info from forecast.io
-	loadOutsideWeather();
+        loadCurrentData(); 
+        loadLastData();
+	    loadOutsideWeather();
     }
 
     if(this.options.doStats) {
         // Ironically, at the time of the load event, the chart's data is not yet available....
         window.setTimeout(computeStats, 100);
+        window.setTimeout(computeStatsInside, 200);
     }
 }
 
@@ -548,75 +538,155 @@ function computeStats() {
     var intervalType = $('#dropdown-label-past').data('intervalType');
     
     if (day != undefined) {
-    // Today:
-    stats.today.temperature.min = day[0].dataMin;
-    stats.today.temperature.max = day[0].dataMax;
-    stats.today.humidity.min = day[1].dataMin;
-    stats.today.humidity.max = day[1].dataMax;
-    stats.today.pressure.min = day[2].dataMin;
-    stats.today.pressure.max = day[2].dataMax;
-    stats.today.temperature.avg = 0;
-    stats.today.humidity.avg = 0;
-    stats.today.pressure.avg = 0;
+        // Today:
+        stats.today.temperature.min = day[0].dataMin;
+        stats.today.temperature.max = day[0].dataMax;
+        stats.today.humidity.min = day[1].dataMin;
+        stats.today.humidity.max = day[1].dataMax;
+        stats.today.pressure.min = day[2].dataMin;
+        stats.today.pressure.max = day[2].dataMax;
+        stats.today.temperature.avg = 0;
+        stats.today.humidity.avg = 0;
+        stats.today.pressure.avg = 0;
 
-    for(var i = 0; i < day[0].data.length; i++) {
-        stats.today.temperature.avg += parseInt(day[0].data[i].y);
-        stats.today.humidity.avg += parseInt(day[1].data[i].y);
-    	stats.today.pressure.avg += parseInt(day[2].data[i].y);
-    }
-    stats.today.temperature.avg = (stats.today.temperature.avg / day[0].data.length).toFixed(1);
-    stats.today.humidity.avg = (stats.today.humidity.avg / day[1].data.length).toFixed(1);
-    stats.today.pressure.avg = (stats.today.pressure.avg / day[2].data.length).toFixed(1);
+        for(var i = 0; i < day[0].data.length; i++) {
+            stats.today.temperature.avg += parseInt(day[0].data[i].y);
+            stats.today.humidity.avg += parseInt(day[1].data[i].y);
+            stats.today.pressure.avg += parseInt(day[2].data[i].y);
+        }
+        stats.today.temperature.avg = (stats.today.temperature.avg / day[0].data.length).toFixed(1);
+        stats.today.humidity.avg = (stats.today.humidity.avg / day[1].data.length).toFixed(1);
+        stats.today.pressure.avg = (stats.today.pressure.avg / day[2].data.length).toFixed(1);
 
-    // Last [selected] interval:
-    stats.interval.temperature.min = interval[0].dataMin;
-    stats.interval.temperature.max = interval[0].dataMax;
-    stats.interval.humidity.min = interval[1].dataMin;
-    stats.interval.humidity.max = interval[1].dataMax;
-    stats.interval.pressure.min = interval[2].dataMin;
-    stats.interval.pressure.max = interval[2].dataMax;
-    stats.interval.temperature.avg = 0;
-    stats.interval.humidity.avg = 0;
-    stats.interval.pressure.avg = 0;
+        // Last [selected] interval:
+        stats.interval.temperature.min = interval[0].dataMin;
+        stats.interval.temperature.max = interval[0].dataMax;
+        stats.interval.humidity.min = interval[1].dataMin;
+        stats.interval.humidity.max = interval[1].dataMax;
+        stats.interval.pressure.min = interval[2].dataMin;
+        stats.interval.pressure.max = interval[2].dataMax;
+        stats.interval.temperature.avg = 0;
+        stats.interval.humidity.avg = 0;
+        stats.interval.pressure.avg = 0;
 
-    for(var i = 0; i < interval[0].data.length; i++) {
-        stats.interval.temperature.avg += parseInt(interval[0].data[i].y);
-        stats.interval.humidity.avg += parseInt(interval[1].data[i].y);
-        stats.interval.pressure.avg += parseInt(interval[2].data[i].y);
-    }
-    stats.interval.temperature.avg = (stats.interval.temperature.avg / interval[0].data.length).toFixed(1);
-    stats.interval.humidity.avg = (stats.interval.humidity.avg / interval[1].data.length).toFixed(1);
-    stats.interval.pressure.avg = (stats.interval.pressure.avg / interval[2].data.length).toFixed(1);
+        for(var i = 0; i < interval[0].data.length; i++) {
+            stats.interval.temperature.avg += parseInt(interval[0].data[i].y);
+            stats.interval.humidity.avg += parseInt(interval[1].data[i].y);
+            stats.interval.pressure.avg += parseInt(interval[2].data[i].y);
+        }
+        stats.interval.temperature.avg = (stats.interval.temperature.avg / interval[0].data.length).toFixed(1);
+        stats.interval.humidity.avg = (stats.interval.humidity.avg / interval[1].data.length).toFixed(1);
+        stats.interval.pressure.avg = (stats.interval.pressure.avg / interval[2].data.length).toFixed(1);
 
-    var up = '<span class="up-arrow" title="Compared to the selected interval\'s average">&#9650</span>';
-    var down = '<span class="down-arrow" title="Compared to the selected interval\'s average">&#9660</span>';
-    var todayTempArrow = (stats.today.temperature.avg > stats.interval.temperature.avg) ? up : down;
-    var todayHumArrow = (stats.today.humidity.avg > stats.interval.humidity.avg) ? up : down;
-    var todayPressArrow = (stats.today.pressure.avg > stats.interval.pressure.avg) ? up : down;
+        var up = '<span class="up-arrow" title="Compared to the selected interval\'s average">&#9650</span>';
+        var down = '<span class="down-arrow" title="Compared to the selected interval\'s average">&#9660</span>';
+        var todayTempArrow = (stats.today.temperature.avg > stats.interval.temperature.avg) ? up : down;
+        var todayHumArrow = (stats.today.humidity.avg > stats.interval.humidity.avg) ? up : down;
+        var todayPressArrow = (stats.today.pressure.avg > stats.interval.pressure.avg) ? up : down;
 
 
-    $stats.append('<tr><th>Temperature</th><th>today</th><th>' + intervalType + '</th></tr>');
-    $stats.append('<tr><th class="sub">avg</th><td>' + todayTempArrow + stats.today.temperature.avg + '°</td><td>' + stats.interval.temperature.avg + '°</td></tr>');
-    $stats.append('<tr><th class="sub">min</th><td>' + stats.today.temperature.min + '°</td><td>' + stats.interval.temperature.min + '°</td></tr>');
-    $stats.append('<tr><th class="sub">max</th><td>' + stats.today.temperature.max + '°</td><td>' + stats.interval.temperature.max + '°</td></tr>');
-    $stats.append('<tr><th>Humidity</th><th>today</th><th>' + intervalType + '</th></tr>');
-    $stats.append('<tr><th class="sub">avg</th><td>' + todayHumArrow + stats.today.humidity.avg + '%</td><td>' + stats.interval.humidity.avg + '%</td></tr>');
-    $stats.append('<tr><th class="sub">min</th><td>' + stats.today.humidity.min + '%</td><td>' + stats.interval.humidity.min + '%</td></tr>');
-    $stats.append('<tr><th class="sub">max</th><td>' + stats.today.humidity.max + '%</td><td>' + stats.interval.humidity.max + '%</td></tr>');
-    $stats.append('<tr><th>Pressure</th><th>today</th><th>' + intervalType + '</th></tr>');
-    $stats.append('<tr><th class="sub">avg</th><td>' + todayPressArrow + stats.today.pressure.avg + ' hPa</td><td>' + stats.interval.pressure.avg + ' hPa</td></tr>');
-    $stats.append('<tr><th class="sub">min</th><td>' + stats.today.pressure.min + ' hPa</td><td>' + stats.interval.pressure.min + ' hPa</td></tr>');
-    $stats.append('<tr><th class="sub">max</th><td>' + stats.today.pressure.max + ' hPa</td><td>' + stats.interval.pressure.max + ' hPa</td></tr>');
-} else {
-    //if no stats are available, load other info
-     if (config.remoteSensorMode == false) {
-        loadCurrentData();
+        $stats.append('<tr><th>Temperature</th><th>today</th><th>' + intervalType + '</th></tr>');
+        $stats.append('<tr><th class="sub">avg</th><td>' + todayTempArrow + stats.today.temperature.avg + '°</td><td>' + stats.interval.temperature.avg + '°</td></tr>');
+        $stats.append('<tr><th class="sub">min</th><td>' + stats.today.temperature.min + '°</td><td>' + stats.interval.temperature.min + '°</td></tr>');
+        $stats.append('<tr><th class="sub">max</th><td>' + stats.today.temperature.max + '°</td><td>' + stats.interval.temperature.max + '°</td></tr>');
+        $stats.append('<tr><th>Humidity</th><th>today</th><th>' + intervalType + '</th></tr>');
+        $stats.append('<tr><th class="sub">avg</th><td>' + todayHumArrow + stats.today.humidity.avg + '%</td><td>' + stats.interval.humidity.avg + '%</td></tr>');
+        $stats.append('<tr><th class="sub">min</th><td>' + stats.today.humidity.min + '%</td><td>' + stats.interval.humidity.min + '%</td></tr>');
+        $stats.append('<tr><th class="sub">max</th><td>' + stats.today.humidity.max + '%</td><td>' + stats.interval.humidity.max + '%</td></tr>');
+        $stats.append('<tr><th>Pressure</th><th>today</th><th>' + intervalType + '</th></tr>');
+        $stats.append('<tr><th class="sub">avg</th><td>' + todayPressArrow + stats.today.pressure.avg + ' hPa</td><td>' + stats.interval.pressure.avg + ' hPa</td></tr>');
+        $stats.append('<tr><th class="sub">min</th><td>' + stats.today.pressure.min + ' hPa</td><td>' + stats.interval.pressure.min + ' hPa</td></tr>');
+        $stats.append('<tr><th class="sub">max</th><td>' + stats.today.pressure.max + ' hPa</td><td>' + stats.interval.pressure.max + ' hPa</td></tr>');
     } else {
+        //if no stats are available, load other info
+        loadCurrentData();
         loadLastData();
+        loadOutsideWeather();
     }
-    loadOutsideWeather();
 }
+
+
+function computeStatsInside() {
+    var $stats = $('#stats-inside');
+    $stats.empty();
+
+    var day, interval;
+    if ($('#chart-today-vs-inside').highcharts() != undefined) {
+        day = $('#chart-today-vs-inside').highcharts().series;
+    }
+    if ($('#chart-past').highcharts() != undefined) {
+        interval = $('#chart-past-inside').highcharts().series;
+    }
+    var intervalType = $('#dropdown-label-past-inside').data('intervalType');
+    
+    if (day != undefined) {
+        // Today:
+        stats.today.temperature.min = day[0].dataMin;
+        stats.today.temperature.max = day[0].dataMax;
+        stats.today.humidity.min = day[1].dataMin;
+        stats.today.humidity.max = day[1].dataMax;
+        stats.today.pressure.min = day[2].dataMin;
+        stats.today.pressure.max = day[2].dataMax;
+        stats.today.temperature.avg = 0;
+        stats.today.humidity.avg = 0;
+        stats.today.pressure.avg = 0;
+
+        for(var i = 0; i < day[0].data.length; i++) {
+            stats.today.temperature.avg += parseInt(day[0].data[i].y);
+            stats.today.humidity.avg += parseInt(day[1].data[i].y);
+            stats.today.pressure.avg += parseInt(day[2].data[i].y);
+        }
+        stats.today.temperature.avg = (stats.today.temperature.avg / day[0].data.length).toFixed(1);
+        stats.today.humidity.avg = (stats.today.humidity.avg / day[1].data.length).toFixed(1);
+        stats.today.pressure.avg = (stats.today.pressure.avg / day[2].data.length).toFixed(1);
+
+        // Last [selected] interval:
+        stats.interval.temperature.min = interval[0].dataMin;
+        stats.interval.temperature.max = interval[0].dataMax;
+        stats.interval.humidity.min = interval[1].dataMin;
+        stats.interval.humidity.max = interval[1].dataMax;
+        stats.interval.pressure.min = interval[2].dataMin;
+        stats.interval.pressure.max = interval[2].dataMax;
+        stats.interval.temperature.avg = 0;
+        stats.interval.humidity.avg = 0;
+        stats.interval.pressure.avg = 0;
+
+        for(var i = 0; i < interval[0].data.length; i++) {
+            stats.interval.temperature.avg += parseInt(interval[0].data[i].y);
+            stats.interval.humidity.avg += parseInt(interval[1].data[i].y);
+            stats.interval.pressure.avg += parseInt(interval[2].data[i].y);
+        }
+        stats.interval.temperature.avg = (stats.interval.temperature.avg / interval[0].data.length).toFixed(1);
+        stats.interval.humidity.avg = (stats.interval.humidity.avg / interval[1].data.length).toFixed(1);
+        stats.interval.pressure.avg = (stats.interval.pressure.avg / interval[2].data.length).toFixed(1);
+
+        var up = '<span class="up-arrow" title="Compared to the selected interval\'s average">&#9650</span>';
+        var down = '<span class="down-arrow" title="Compared to the selected interval\'s average">&#9660</span>';
+        var todayTempArrow = (stats.today.temperature.avg > stats.interval.temperature.avg) ? up : down;
+        var todayHumArrow = (stats.today.humidity.avg > stats.interval.humidity.avg) ? up : down;
+        var todayPressArrow = (stats.today.pressure.avg > stats.interval.pressure.avg) ? up : down;
+
+
+        $stats.append('<tr><th>Temperature</th><th>today</th><th>' + intervalType + '</th></tr>');
+        $stats.append('<tr><th class="sub">avg</th><td>' + todayTempArrow + stats.today.temperature.avg + '°</td><td>' + stats.interval.temperature.avg + '°</td></tr>');
+        $stats.append('<tr><th class="sub">min</th><td>' + stats.today.temperature.min + '°</td><td>' + stats.interval.temperature.min + '°</td></tr>');
+        $stats.append('<tr><th class="sub">max</th><td>' + stats.today.temperature.max + '°</td><td>' + stats.interval.temperature.max + '°</td></tr>');
+        $stats.append('<tr><th>Humidity</th><th>today</th><th>' + intervalType + '</th></tr>');
+        $stats.append('<tr><th class="sub">avg</th><td>' + todayHumArrow + stats.today.humidity.avg + '%</td><td>' + stats.interval.humidity.avg + '%</td></tr>');
+        $stats.append('<tr><th class="sub">min</th><td>' + stats.today.humidity.min + '%</td><td>' + stats.interval.humidity.min + '%</td></tr>');
+        $stats.append('<tr><th class="sub">max</th><td>' + stats.today.humidity.max + '%</td><td>' + stats.interval.humidity.max + '%</td></tr>');
+        $stats.append('<tr><th>Pressure</th><th>today</th><th>' + intervalType + '</th></tr>');
+        $stats.append('<tr><th class="sub">avg</th><td>' + todayPressArrow + stats.today.pressure.avg + ' hPa</td><td>' + stats.interval.pressure.avg + ' hPa</td></tr>');
+        $stats.append('<tr><th class="sub">min</th><td>' + stats.today.pressure.min + ' hPa</td><td>' + stats.interval.pressure.min + ' hPa</td></tr>');
+        $stats.append('<tr><th class="sub">max</th><td>' + stats.today.pressure.max + ' hPa</td><td>' + stats.interval.pressure.max + ' hPa</td></tr>');
+    } else {
+        //if no stats are available, load other info
+        loadCurrentData();
+        loadLastData();
+        loadOutsideWeather();
+    }
 }
+
 
 function autoReload() {
     var time = new Date();
@@ -648,13 +718,16 @@ $(document).ready(function() {
     getLocation();
 
     loadDoubleChart('/api/compare/today/yesterday', '#chart-today-vs');
+    loadDoubleChart('/api/compare/today/yesterday_Indoor', '#chart-today-vs-inside');
 
     loadChart('/api/past/week', '#chart-past');
+    loadChart('/api/past/week_Indoor', '#chart-past-inside');
     // loadCurrentData() is fired by chartComplete()
 
     $('[data-toggle="tooltip"]').tooltip();
 
     $('#dropdown-label-past').data('intervalType', 'week');
+    $('#dropdown-label-past-inside').data('intervalType', 'week');
 
     $(document).ajaxError(function() {
         // Display only one instance of a network error, although multiple failing AJAX calls trigger this event
@@ -683,14 +756,23 @@ $(document).ready(function() {
 
     });
 
+    $('#chart-interval-past-inside').on('click', function(e) {
+        e.preventDefault();
+
+        var interval = $(e.target).parent().attr('data-interval');
+        $('#dropdown-label-past-inside').text(interval).data('intervalType', interval); // Data used in computeStatsInside()
+        loadChart('/api/past/' + interval + '_Indoor', '#chart-past-inside');
+
+    });    
+
+    $('#btn-reload-outside-sensor').on('click', function() {
+        $('#curr-temp, #curr-hum, #curr-press').text('...');
+        loadCurrentData();
+    });
 
     $('#btn-reload-inside').on('click', function() {
         $('#curr-temp-inside, #curr-hum-inside, #curr-press-inside').text('...');
-        if (config.remoteSensorMode == false) {
-           loadCurrentData();
-       } else {
-           loadLastData();
-       }
+        loadLastData();
     });
 
     $('#btn-reload-outside').on('click', function() {
@@ -700,8 +782,8 @@ $(document).ready(function() {
 
     $('#btn-reload-all').on('click', function() {
         $('#error-container').empty();
-        $('#curr-temp-outside, #curr-hum-outside, #curr-press-outside, #prec-prob-outside, #prec-int-outside, #prec-type-outside, #curr-temp-inside, #curr-hum-inside, #curr-press-inside, #forecast-summary').text('...');
-        $('#chart-today-vs, #chart-past').each(function(i, el) {
+        $('#curr-temp-outside, #curr-hum-outside, #curr-press-outside, #prec-prob-outside, #prec-int-outside, #prec-type-outside, #curr-temp-inside, #curr-hum-inside, #curr-press-inside, #curr-temp, #curr-hum, #curr-press, #forecast-summary').text('...');
+        $('#chart-today-vs, #chart-past, #chart-today-vs-inside, #chart-past-inside').each(function(i, el) {
             if ($(el).highcharts()) {
                 // It might be uninitialized due to a previous error (eg. network error)
                 $(el).highcharts().destroy();
@@ -712,6 +794,8 @@ $(document).ready(function() {
         loadOutsideWeather();
         loadDoubleChart('/api/compare/today/yesterday', '#chart-today-vs');
         loadChart('/api/past/week', '#chart-past');
+        loadDoubleChart('/api/compare/today/yesterday_Indoor', '#chart-today-vs-inside');
+        loadChart('/api/past/week_Indoor', '#chart-past-inside');        
         // loadCurrentData() is fired by chartComplete()
     });
 });
