@@ -11,6 +11,8 @@
 #include <Adafruit_BME280.h>
 #include "Wire.h"
 
+#define ALTITUDE (93)
+
 //WiFi properties
 const char* ssid = "SSID";
 const char* password = "password";
@@ -123,6 +125,7 @@ void loop() {
   Serial.println("Retrieving sensor data...");
   float tempC = mySensor.readTemperature();
   float pressure = mySensor.readPressure();
+  pressure = pressure * pow((1 - (0.0065 * ALTITUDE) / (temperature + 0.0065 * ALTITUDE + 273.15)), (-5.257));
   float humidity = mySensor.readHumidity();
 
   DynamicJsonBuffer jsonBuffer;
