@@ -9,7 +9,7 @@ dir_path = os.path.dirname(os.path.abspath(__file__))
 try:
     db = sqlite3.connect(os.path.join(dir_path, '../raspi-weather.db'))
     c = db.cursor()
-    c.execute('SELECT * FROM indoor ORDER BY id DESC LIMIT 1')
+    c.execute('SELECT * FROM indoor_in ORDER BY id DESC LIMIT 1')
     row = c.fetchone()
     timestamp = row[1]
     temperature = row[2]

@@ -20,7 +20,7 @@ var db = {
 
         var hourString = -hours + ' hours';
         var stmt = db.connection.prepare(
-            'SELECT timestamp, temperature, humidity, pressure FROM outdoor WHERE timestamp >= datetime(?, ?, ?)',
+            'SELECT timestamp, temperature, humidity, pressure FROM indoor WHERE timestamp >= datetime(?, ?, ?)',
             function(err) {
                 if(err) {
                     db.errorHandler(err, res);
@@ -44,7 +44,7 @@ var db = {
 
         var hourString = -hours + ' hours';
         var stmt = db.connection.prepare(
-            'SELECT timestamp, temperature, humidity, pressure FROM indoor WHERE timestamp >= datetime(?, ?, ?)',
+            'SELECT timestamp, temperature, humidity, pressure FROM indoor_in WHERE timestamp >= datetime(?, ?, ?)',
             function(err) {
                 if(err) {
                     db.errorHandler(err, res);
@@ -64,171 +64,6 @@ var db = {
     },
 
     getComparison: function(firstType, secondType, res) {
-        db.connect();
-
-        var result = {
-            first: {
-                type: firstType,
-                data: []
-            },
-            second: {
-                type: secondType,
-                data: []
-            }
-        };
-
-        db.connection.serialize(function() {
-            if(firstType === 'today') {
-                var stmt = db.connection.prepare(
-                    'SELECT timestamp, temperature, humidity, pressure FROM outdoor WHERE timestamp >= datetime(?, ?, ?)',
-                    function(err) {
-                        if(err) {
-                            db.errorHandler(err, res);
-                        }
-                    }
-                );
-                stmt.all(['now', 'localtime', 'start of day'], function(err, rows) {
-                    if(err) {
-                        db.errorHandler(err, res);
-                    } else {
-                        result.first.data = rows;
-                        // The result is not yet ready,
-                        // we'll return both in the second query callback
-                        // (the queries are serialized)
-                    }
-                });
-            }
-
-            if(secondType === 'yesterday') {
-                var stmt = db.connection.prepare(
-                    'SELECT timestamp, temperature, humidity, pressure\
-                    FROM outdoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
-                    AND timestamp <= datetime($now, $timezone, $start)',
-                    function(err) {
-                        if(err) {
-                            db.errorHandler(err, res);
-                        }
-                    }
-                );
-                stmt.all({
-                    $now: 'now',
-                    $timezone: 'localtime',
-                    $start: 'start of day',
-                    $minus: '-1 day'
-                }, function(err, rows) {
-                    if(err) {
-                        db.errorHandler(err, res);
-                    } else {
-                        result.second.data = rows;
-                        result.success = true;
-                        res.json(result);
-                    }
-                });
-            } else if(secondType === 'week') {
-                var stmt = db.connection.prepare(
-                    'SELECT timestamp, temperature, humidity, pressure\
-                    FROM outdoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
-                    AND timestamp <= datetime($now, $timezone, $start)',
-                    function(err) {
-                        if(err) {
-                            db.errorHandler(err, res);
-                        }
-                    }
-                );
-                stmt.all({
-                    $now: 'now',
-                    $timezone: 'localtime',
-                    $start: 'start of day',
-                    $minus: '-7 days'
-                }, function(err, rows) {
-                    if(err) {
-                        db.errorHandler(err, res);
-                    } else {
-                        result.second.data = rows;
-                        result.success = true;
-                        res.json(result);
-                    }
-                });
-            } else if(secondType === 'month') {
-                var stmt = db.connection.prepare(
-                    'SELECT timestamp, temperature, humidity, pressure\
-                    FROM outdoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
-                    AND timestamp <= datetime($now, $timezone, $start)',
-                    function(err) {
-                        if(err) {
-                            db.errorHandler(err, res);
-                        }
-                    }
-                );
-                stmt.all({
-                    $now: 'now',
-                    $timezone: 'localtime',
-                    $start: 'start of day',
-                    $minus: '-30 days'
-                }, function(err, rows) {
-                    if(err) {
-                        db.errorHandler(err, res);
-                    } else {
-                        result.second.data = rows;
-                        result.success = true;
-                        res.json(result);
-                    }
-                });
-            } else if(secondType === '6months') {
-                var stmt = db.connection.prepare(
-                    'SELECT timestamp, temperature, humidity, pressure\
-                    FROM outdoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
-                    AND timestamp <= datetime($now, $timezone, $start)',
-                    function(err) {
-                        if(err) {
-                            db.errorHandler(err, res);
-                        }
-                    }
-                );
-                stmt.all({
-                    $now: 'now',
-                    $timezone: 'localtime',
-                    $start: 'start of day',
-                    $minus: '-180 days'
-                }, function(err, rows) {
-                    if(err) {
-                        db.errorHandler(err, res);
-                    } else {
-                        result.second.data = rows;
-                        result.success = true;
-                        res.json(result);
-                    }
-                });
-            } else if(secondType === 'year') {
-                var stmt = db.connection.prepare(
-                    'SELECT timestamp, temperature, humidity, pressure\
-                    FROM outdoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
-                    AND timestamp <= datetime($now, $timezone, $start)',
-                    function(err) {
-                        if(err) {
-                            db.errorHandler(err, res);
-                        }
-                    }
-                );
-                stmt.all({
-                    $now: 'now',
-                    $timezone: 'localtime',
-                    $start: 'start of day',
-                    $minus: '-365 days'
-                }, function(err, rows) {
-                    if(err) {
-                        db.errorHandler(err, res);
-                    } else {
-                        result.second.data = rows;
-                        result.success = true;
-                        res.json(result);
-                    }
-                });
-            }
-        });
-    }
-
-    getComparisonIndoor: function(firstType, secondType, res) {
         db.connect();
 
         var result = {
@@ -368,6 +203,171 @@ var db = {
                 var stmt = db.connection.prepare(
                     'SELECT timestamp, temperature, humidity, pressure\
                     FROM indoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
+                    AND timestamp <= datetime($now, $timezone, $start)',
+                    function(err) {
+                        if(err) {
+                            db.errorHandler(err, res);
+                        }
+                    }
+                );
+                stmt.all({
+                    $now: 'now',
+                    $timezone: 'localtime',
+                    $start: 'start of day',
+                    $minus: '-365 days'
+                }, function(err, rows) {
+                    if(err) {
+                        db.errorHandler(err, res);
+                    } else {
+                        result.second.data = rows;
+                        result.success = true;
+                        res.json(result);
+                    }
+                });
+            }
+        });
+    }
+
+    getComparisonIndoor: function(firstType, secondType, res) {
+        db.connect();
+
+        var result = {
+            first: {
+                type: firstType,
+                data: []
+            },
+            second: {
+                type: secondType,
+                data: []
+            }
+        };
+
+        db.connection.serialize(function() {
+            if(firstType === 'today') {
+                var stmt = db.connection.prepare(
+                    'SELECT timestamp, temperature, humidity, pressure FROM indoor_in WHERE timestamp >= datetime(?, ?, ?)',
+                    function(err) {
+                        if(err) {
+                            db.errorHandler(err, res);
+                        }
+                    }
+                );
+                stmt.all(['now', 'localtime', 'start of day'], function(err, rows) {
+                    if(err) {
+                        db.errorHandler(err, res);
+                    } else {
+                        result.first.data = rows;
+                        // The result is not yet ready,
+                        // we'll return both in the second query callback
+                        // (the queries are serialized)
+                    }
+                });
+            }
+
+            if(secondType === 'yesterday') {
+                var stmt = db.connection.prepare(
+                    'SELECT timestamp, temperature, humidity, pressure\
+                    FROM indoor_in WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
+                    AND timestamp <= datetime($now, $timezone, $start)',
+                    function(err) {
+                        if(err) {
+                            db.errorHandler(err, res);
+                        }
+                    }
+                );
+                stmt.all({
+                    $now: 'now',
+                    $timezone: 'localtime',
+                    $start: 'start of day',
+                    $minus: '-1 day'
+                }, function(err, rows) {
+                    if(err) {
+                        db.errorHandler(err, res);
+                    } else {
+                        result.second.data = rows;
+                        result.success = true;
+                        res.json(result);
+                    }
+                });
+            } else if(secondType === 'week') {
+                var stmt = db.connection.prepare(
+                    'SELECT timestamp, temperature, humidity, pressure\
+                    FROM indoor_in WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
+                    AND timestamp <= datetime($now, $timezone, $start)',
+                    function(err) {
+                        if(err) {
+                            db.errorHandler(err, res);
+                        }
+                    }
+                );
+                stmt.all({
+                    $now: 'now',
+                    $timezone: 'localtime',
+                    $start: 'start of day',
+                    $minus: '-7 days'
+                }, function(err, rows) {
+                    if(err) {
+                        db.errorHandler(err, res);
+                    } else {
+                        result.second.data = rows;
+                        result.success = true;
+                        res.json(result);
+                    }
+                });
+            } else if(secondType === 'month') {
+                var stmt = db.connection.prepare(
+                    'SELECT timestamp, temperature, humidity, pressure\
+                    FROM indoor_in WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
+                    AND timestamp <= datetime($now, $timezone, $start)',
+                    function(err) {
+                        if(err) {
+                            db.errorHandler(err, res);
+                        }
+                    }
+                );
+                stmt.all({
+                    $now: 'now',
+                    $timezone: 'localtime',
+                    $start: 'start of day',
+                    $minus: '-30 days'
+                }, function(err, rows) {
+                    if(err) {
+                        db.errorHandler(err, res);
+                    } else {
+                        result.second.data = rows;
+                        result.success = true;
+                        res.json(result);
+                    }
+                });
+            } else if(secondType === '6months') {
+                var stmt = db.connection.prepare(
+                    'SELECT timestamp, temperature, humidity, pressure\
+                    FROM indoor_in WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
+                    AND timestamp <= datetime($now, $timezone, $start)',
+                    function(err) {
+                        if(err) {
+                            db.errorHandler(err, res);
+                        }
+                    }
+                );
+                stmt.all({
+                    $now: 'now',
+                    $timezone: 'localtime',
+                    $start: 'start of day',
+                    $minus: '-180 days'
+                }, function(err, rows) {
+                    if(err) {
+                        db.errorHandler(err, res);
+                    } else {
+                        result.second.data = rows;
+                        result.success = true;
+                        res.json(result);
+                    }
+                });
+            } else if(secondType === 'year') {
+                var stmt = db.connection.prepare(
+                    'SELECT timestamp, temperature, humidity, pressure\
+                    FROM indoor_in WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
                     AND timestamp <= datetime($now, $timezone, $start)',
                     function(err) {
                         if(err) {

@@ -55,7 +55,7 @@ def clientthread(conn):
     try:
         db = sqlite3.connect(os.path.join(dir_path, '../raspi-weather.db'))
         c = db.cursor()
-        c.execute("""CREATE TABLE IF NOT EXISTS indoor(
+        c.execute("""CREATE TABLE IF NOT EXISTS indoor_in(
             `id`            INTEGER PRIMARY KEY AUTOINCREMENT,
             `timestamp`     DATETIME,
             `temperature`   NUMERIC,
@@ -65,7 +65,7 @@ def clientthread(conn):
         f.write('Inserting data: Timestamp = %s'%timestamp + ', Temp = {0:0.3f} deg C'.format(degrees) + ', Pressure = {0:0.2f} hPa'.format(hectopascals) + ', Humidity = {0:0.2f} %'.format(humidity) + '\n')
         print 'Inserting data: Timestamp = %s'%timestamp + ', Temp = {0:0.3f} deg C'.format(degrees) + ', Pressure = {0:0.2f} hPa'.format(hectopascals) + ', Humidity = {0:0.2f} %'.format(humidity)
         args = [timestamp, round(degrees, 2), int(humidity), round(hectopascals , 2)]
-        c.execute('INSERT INTO indoor (timestamp, temperature, humidity, pressure) VALUES (?, ?, ?, ?)', args)
+        c.execute('INSERT INTO indoor_in (timestamp, temperature, humidity, pressure) VALUES (?, ?, ?, ?)', args)
         db.commit()
         db.close()
         print("Done")
