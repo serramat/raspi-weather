@@ -123,14 +123,14 @@ void loop() {
   digitalWrite(statusLed, HIGH);
 
   Serial.println("Retrieving sensor data...");
-  float tempC = mySensor.readTemperature();
+  float temperature = mySensor.readTemperature();
   float pressure = mySensor.readPressure();
   pressure = pressure * pow((1 - (0.0065 * ALTITUDE) / (temperature + 0.0065 * ALTITUDE + 273.15)), (-5.257));
   float humidity = mySensor.readHumidity();
 
   DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
-  root["tempC"] = String(tempC, 1);
+  root["temperature"] = String(temperature, 1);
   root["pressure"] = String(pressure, 2);
   root["humidity"] = String(humidity, 0);
 
