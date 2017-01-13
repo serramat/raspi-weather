@@ -276,6 +276,19 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
             return;
         }
 
+        var date;
+        if (json.second.type === "yesterday") {
+            date = "yesterday";
+        } else if (json.second.type === "week") {
+            date = "7 days ago";
+        } else if (json.second.type === "month") {
+            date = "1 month ago";
+        } else if (json.second.type === "6month") {
+            date = "6 months ago";
+        } else if (json.second.type === "year") {
+            date = "1 year ago";
+        }
+
         if(json.first.data.length === 0 || json.second.data.length === 0) {
             displayError('No data to display.', DOMtarget);
             return;
@@ -283,24 +296,12 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
 
         // Make sure yesterday's data starts at 00:00
         if(moment.utc(json.second.data[0].timestamp).hours() !== 0) {
-            displayError('Not enough data for yesterday. A full day\'s data is required for comparison.', DOMtarget);
+            displayError('Not enough data for ' + date + '. A full day\'s data is required for comparison.', DOMtarget);
             $(document).trigger('chartComplete');
             return;
         }
 
         var options = $.extend(true, {}, globalHighchartsOptions, moreOptions);
-        var date;
-        if (json.second.type === "yesterday") {
-            date = "yesterday";
-        } else if (json.second.type === "week") {
-            date = " 7 days ago";
-        } else if (json.second.type === "month") {
-            date = " 1 month ago";
-        } else if (json.second.type === "6month") {
-            date = " 6 months ago";
-        } else if (json.second.type === "year") {
-            date = " 1 year ago";
-        }
 
         // Add more series
         options.series.push({
