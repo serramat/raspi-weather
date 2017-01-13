@@ -289,10 +289,22 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
         }
 
         var options = $.extend(true, {}, globalHighchartsOptions, moreOptions);
+        var date;
+        if (json.second.type === "yesterday") {
+            date = "yesterday";
+        } else if (json.second.type === "week") {
+            date = " 7 days ago";
+        } else if (json.second.type === "month") {
+            date = " 1 month ago";
+        } else if (json.second.type === "6month") {
+            date = " 6 months ago";
+        } else if (json.second.type === "year") {
+            date = " 1 year ago";
+        }
 
         // Add more series
         options.series.push({
-            name: 'Temperature yesterday',
+            name: 'Temperature ' + date,
             yAxis: 0,
             data: [],
             lineWidth: 2,
@@ -319,7 +331,7 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
         });
 
         options.series.push({
-            name: 'Humidity yesterday',
+            name: 'Humidity ' + date,
             yAxis: 1,
             data: [],
             lineWidth: 2,
@@ -334,7 +346,7 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
         });
 
 	options.series.push({
-            name: 'Pressure yesterday',
+            name: 'Pressure ' + date,
             yAxis: 2,
             data: [],
             lineWidth: 2,
@@ -359,7 +371,19 @@ function loadDoubleChart(APICall, DOMtarget, moreOptions) {
             // because otherwise Highcharts would display a separate bubble entry
             // for today's and yesterday's value, but (in theory) these were measured at the same time during of the day
             // (running sensor_scripts/logger.py can be a few seconds off)
-            var m = moment.utc(el.timestamp).local().subtract(1, 'days').seconds(0);
+            var m; 
+            if (json.second.type === "yesterday") {
+                m = moment.utc(el.timestamp).local().subtract(1, 'days').seconds(0);
+            } else if (json.second.type === "week") {
+                m = moment.utc(el.timestamp).local().subtract(7, 'days').seconds(0);
+            } else if (json.second.type === "month") {
+                m = moment.utc(el.timestamp).local().subtract(30, 'days').seconds(0);
+            } else if (json.second.type === "6month") {
+                m = moment.utc(el.timestamp).local().subtract(180, 'days').seconds(0);
+            } else if (json.second.type === "year") {
+                m = moment.utc(el.timestamp).local().subtract(365, 'days').seconds(0);
+            }            
+
             options.series[0].data.push([
                 m.valueOf(),
                 format(el.temperature)
@@ -434,7 +458,7 @@ function loadLastData() {
 
         $('#curr-temp-inside').text(format(json.temperature) + '°');
         $('#curr-hum-inside').text(json.humidity + '%');
-	    $('#curr-press-inside').text(json.pressure + ' hPa');
+	$('#curr-press-inside').text(json.pressure + ' hPa');
     });
 }
 
@@ -447,7 +471,7 @@ function chartComplete() {
         // because it takes a long time and slows down poor little Pi :(
         loadCurrentData(); 
         loadLastData();
-	    loadOutsideWeather();
+	loadOutsideWeather();
     }
 
     if(this.options.doStats) {
@@ -605,7 +629,6 @@ function computeStats() {
     }
 }
 
-
 function computeStatsInside() {
     var $stats = $('#stats-inside');
     $stats.empty();
@@ -746,6 +769,23 @@ $(document).ready(function() {
 
 
     // UI events
+    // Today vs: dropdown change interval 
+    $('#chart-interval-today-vs').on('click', function(e) {
+        e.preventDefault();
+
+        var interval = $(e.target).parent().attr('data-selector');
+        loadDoubleChart('/api/compare/today/' + interval, '#chart-today-vs');
+
+    });
+
+    $('#chart-interval-today-vs-inside').on('click', function(e) {
+        e.preventDefault();
+
+        var interval = $(e.target).parent().attr('data-selector');
+        loadDoubleChart('/api/compare/today/' + interval + '_Indoor', '#chart-today-vs-inside');
+
+    });
+
     // Past chart: dropdown change interval
     $('#chart-interval-past').on('click', function(e) {
         e.preventDefault();

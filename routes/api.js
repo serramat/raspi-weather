@@ -13,6 +13,7 @@ router.get('/last', function(req, res) {
     res.json(sensor.getLast());
 });
 
+//OUTSIDE
 
 /* GET past 24h */
 router.get('/past/24h', function(req, res) {
@@ -50,6 +51,28 @@ router.get('/compare/today/yesterday', function(req, res) {
     db.getComparison('today', 'yesterday', res);
 });
 
+/* GET week vs today */
+router.get('/compare/today/week', function(req, res) {
+    db.getComparison('today', 'week', res);
+});
+
+/* GET month vs today */
+router.get('/compare/today/month', function(req, res) {
+    db.getComparison('today', 'month', res);
+});
+
+/* GET 6month vs today */
+router.get('/compare/today/6month', function(req, res) {
+    db.getComparison('today', '6month', res);
+});
+
+/* GET year vs today */
+router.get('/compare/today/year', function(req, res) {
+    db.getComparison('today', 'year', res);
+});
+
+// INSIDE
+
 /* GET past 24h */
 router.get('/past/24h_Indoor', function(req, res) {
     // Callback...
@@ -84,6 +107,26 @@ router.get('/past/year_Indoor', function(req, res) {
 /* GET yesterday vs today */
 router.get('/compare/today/yesterday_Indoor', function(req, res) {
     db.getComparisonIndoor('today', 'yesterday', res);
+});
+
+/* GET week vs today */
+router.get('/compare/today/week_Indoor', function(req, res) {
+    db.getComparisonIndoor('today', 'week', res);
+});
+
+/* GET month vs today */
+router.get('/compare/today/month_Indoor', function(req, res) {
+    db.getComparisonIndoor('today', 'month', res);
+});
+
+/* GET 6month vs today */
+router.get('/compare/today/6month_Indoor', function(req, res) {
+    db.getComparisonIndoor('today', '6month', res);
+});
+
+/* GET year vs today */
+router.get('/compare/today/year_Indoor', function(req, res) {
+    db.getComparisonIndoor('today', 'year', res);
 });
 
 module.exports = router;

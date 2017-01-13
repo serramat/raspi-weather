@@ -128,7 +128,7 @@ var db = {
                 var stmt = db.connection.prepare(
                     'SELECT timestamp, temperature, humidity, pressure\
                     FROM indoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
-                    AND timestamp <= datetime($now, $timezone, $start)',
+                    AND timestamp <= datetime($now, $timezone, $minus)',
                     function(err) {
                         if(err) {
                             db.errorHandler(err, res);
@@ -153,7 +153,7 @@ var db = {
                 var stmt = db.connection.prepare(
                     'SELECT timestamp, temperature, humidity, pressure\
                     FROM indoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
-                    AND timestamp <= datetime($now, $timezone, $start)',
+                    AND timestamp <= datetime($now, $timezone, $minus)',
                     function(err) {
                         if(err) {
                             db.errorHandler(err, res);
@@ -174,11 +174,11 @@ var db = {
                         res.json(result);
                     }
                 });
-            } else if(secondType === '6months') {
+            } else if(secondType === '6month') {
                 var stmt = db.connection.prepare(
                     'SELECT timestamp, temperature, humidity, pressure\
                     FROM indoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
-                    AND timestamp <= datetime($now, $timezone, $start)',
+                    AND timestamp <= datetime($now, $timezone, $minus)',
                     function(err) {
                         if(err) {
                             db.errorHandler(err, res);
@@ -203,7 +203,7 @@ var db = {
                 var stmt = db.connection.prepare(
                     'SELECT timestamp, temperature, humidity, pressure\
                     FROM indoor WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
-                    AND timestamp <= datetime($now, $timezone, $start)',
+                    AND timestamp <= datetime($now, $timezone, $minus)',
                     function(err) {
                         if(err) {
                             db.errorHandler(err, res);
@@ -226,7 +226,7 @@ var db = {
                 });
             }
         });
-    }
+    },
 
     getComparisonIndoor: function(firstType, secondType, res) {
         db.connect();
@@ -339,7 +339,7 @@ var db = {
                         res.json(result);
                     }
                 });
-            } else if(secondType === '6months') {
+            } else if(secondType === '6month') {
                 var stmt = db.connection.prepare(
                     'SELECT timestamp, temperature, humidity, pressure\
                     FROM indoor_in WHERE timestamp >= datetime($now, $timezone, $start, $minus)\
