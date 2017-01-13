@@ -772,8 +772,22 @@ $(document).ready(function() {
     // Today vs: dropdown change interval 
     $('#chart-interval-today-vs').on('click', function(e) {
         e.preventDefault();
-
+        
         var interval = $(e.target).parent().attr('data-selector');
+        var intervalText;
+        if(interval === 'yesterday') {
+           intervalText = 'yesterday';
+        } else if(interval === 'week') {
+           intervalText = '7 days ago';
+        } else if(interval === 'month') {
+           intervalText = '1 month ago';
+        } else if(interval === '6month') {
+           intervalText = '6 months ago';
+        } else if(interval === 'year') {
+           intervalText = '1 year ago';
+        }  
+
+        $('#dropdown-label-vs').text(intervalText).data('intervalType', interval);
         loadDoubleChart('/api/compare/today/' + interval, '#chart-today-vs');
 
     });
@@ -782,6 +796,20 @@ $(document).ready(function() {
         e.preventDefault();
 
         var interval = $(e.target).parent().attr('data-selector');
+        var intervalText;
+        if(interval === 'yesterday') {
+           intervalText = 'yesterday';
+        } else if(interval === 'week') {
+           intervalText = '7 days ago';
+        } else if(interval === 'month') {
+           intervalText = '1 month ago';
+        } else if(interval === '6month') {
+           intervalText = '6 months ago';
+        } else if(interval === 'year') {
+           intervalText = '1 year ago';
+        }
+
+        $('#dropdown-label-vs-inside').text(intervalText).data('intervalType', interval);
         loadDoubleChart('/api/compare/today/' + interval + '_Indoor', '#chart-today-vs-inside');
 
     });
