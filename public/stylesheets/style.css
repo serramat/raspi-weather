@@ -64,11 +64,11 @@ body {
     color: #df8a13;
 }
 
-#stats {
+#stats, #stats-inside {
     border-collapse: collapse;
 }
 
-#stats td, #stats th {
+#stats td, #stats th, #stats-inside td, #stats-inside th {
     padding: 3px 5px;
     min-width: 70px;
     text-align: right;
