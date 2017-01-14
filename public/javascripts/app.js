@@ -446,7 +446,8 @@ function loadCurrentData() {
 
         $('#curr-temp').text(format(json.temperature) + '°');
         $('#curr-hum').text(json.humidity + '%');
-	    $('#curr-press').text(json.pressure + ' hPa');
+	$('#curr-press').text(json.pressure + ' hPa');
+        $('#curr-time').text(json.timestamp.substring(11));
     });
 }
 
@@ -460,6 +461,7 @@ function loadLastData() {
         $('#curr-temp-inside').text(format(json.temperature) + '°');
         $('#curr-hum-inside').text(json.humidity + '%');
 	$('#curr-press-inside').text(json.pressure + ' hPa');
+        $('#curr-time-inside').text(json.timestamp.substring(11));
     });
 }
 
@@ -642,7 +644,7 @@ function computeStatsInside() {
         interval = $('#chart-past-inside').highcharts().series;
     }
     var intervalType = $('#dropdown-label-past-inside').data('intervalType');
-    
+
     if (day != undefined) {
         // Today:
         stats.today.temperature.min = day[0].dataMin;
@@ -690,7 +692,6 @@ function computeStatsInside() {
         var todayHumArrow = (stats.today.humidity.avg > stats.interval.humidity.avg) ? up : down;
         var todayPressArrow = (stats.today.pressure.avg > stats.interval.pressure.avg) ? up : down;
 
-
         $stats.append('<tr><th>Temperature</th><th>today</th><th>' + intervalType + '</th></tr>');
         $stats.append('<tr><th class="sub">avg</th><td>' + todayTempArrow + stats.today.temperature.avg + '°</td><td>' + stats.interval.temperature.avg + '°</td></tr>');
         $stats.append('<tr><th class="sub">min</th><td>' + stats.today.temperature.min + '°</td><td>' + stats.interval.temperature.min + '°</td></tr>');
@@ -710,7 +711,6 @@ function computeStatsInside() {
         loadOutsideWeather();
     }
 }
-
 
 function autoReload() {
     var time = new Date();

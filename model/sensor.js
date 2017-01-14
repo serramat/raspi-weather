@@ -11,9 +11,10 @@ var sensor = {
         } else {
             return {
                 success: true,
-                temperature: result[0],
-                humidity: result[1],
-		pressure: result[2]
+                timestamp: result[0],
+                temperature: result[1],
+                humidity: result[2],
+		pressure: result[3]
             };
         }
     },
