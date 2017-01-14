@@ -479,8 +479,8 @@ function chartComplete() {
 
     if(this.options.doStats) {
         // Ironically, at the time of the load event, the chart's data is not yet available....
-        window.setTimeout(computeStats, 100);
-        window.setTimeout(computeStatsInside, 200);
+        window.setTimeout(computeStats, 1000);
+        window.setTimeout(computeStatsInside, 1000);
     }
 }
 
